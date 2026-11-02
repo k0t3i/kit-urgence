@@ -1,0 +1,1243 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kit d'urgence 72 h</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#f7f1e6; --bg2:#e8dbc3; --ink:#1d2540; --muted:#4a5270;
+  --accent:#d24a1c; --accent-text:#b23c12; --paper:#fffdf8; --chip:#f3ebdc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#141a2b;font-family:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center}
+[hidden]{display:none!important}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+.stage{
+  position:relative;container-type:size;overflow:hidden;
+  height:min(100vh, calc(100vw * 16 / 9));height:min(100dvh, calc(100vw * 16 / 9));
+  aspect-ratio:9/16;max-width:100vw;
+  background:radial-gradient(110% 70% at 50% 34%, var(--bg1) 0%, var(--bg2) 100%);
+}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* HUD */
+.hud{position:absolute;top:0;left:0;right:0;padding:5cqw 5cqw 0;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.brand small{display:block;font-size:3cqw;color:var(--muted);font-weight:700}
+.brand strong{display:block;font-size:4.8cqw;font-weight:800;line-height:1.1;margin-top:.4cqw}
+.pill{background:var(--accent);color:#fff;font-weight:800;font-size:4.2cqw;padding:1.4cqw 3.4cqw;border-radius:99px;box-shadow:0 1cqw 3cqw rgba(210,74,28,.35);white-space:nowrap}
+.progress{position:absolute;top:17.5cqw;left:5cqw;right:5cqw;height:.9cqw;background:rgba(29,37,64,.12);border-radius:9px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);border-radius:9px}
+
+/* contrôles */
+.controls{position:absolute;top:21.5cqw;left:5cqw;right:5cqw;display:flex;justify-content:space-between;transition:opacity .4s;pointer-events:none}
+.controls .grp{display:flex;gap:2cqw;pointer-events:auto}
+.stage.idle .controls{opacity:0}
+.controls button{width:max(44px,10cqw);height:max(44px,10cqw);border-radius:50%;border:0;background:rgba(255,253,248,.94);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 .8cqw 2.4cqw rgba(29,37,64,.15)}
+.controls svg{width:46%;height:46%}
+.controls button.wide{width:auto;min-width:max(44px,10cqw);padding:0 3.2cqw;border-radius:99px;font:inherit;font-weight:800;font-size:3.6cqw;grid-auto-flow:column;gap:1.2cqw}
+.controls button.wide svg{width:3.4cqw;height:3.4cqw}
+button:focus-visible,.seg input:focus-visible+span,.toggle input:focus-visible,.dur input:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+.badges{position:absolute;inset:0;pointer-events:none}
+.badge{position:absolute;left:0;top:0;width:6.4cqw;height:6.4cqw;margin:-3.2cqw 0 0 -3.2cqw;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:3.3cqw;display:grid;place-items:center;border:.55cqw solid #fff;box-shadow:0 .7cqw 1.8cqw rgba(29,37,64,.3);opacity:0;will-change:transform,opacity}
+
+/* zone basse */
+.bottom{position:absolute;left:4.5cqw;right:4.5cqw;bottom:5cqw;display:flex;flex-direction:column;gap:2.6cqw;pointer-events:none}
+.bottom button{pointer-events:auto}
+.sub{align-self:center;background:rgba(22,28,48,.92);color:#fff;font-size:4.3cqw;line-height:1.3;padding:2.2cqw 4cqw;border-radius:2.8cqw;text-align:center;max-width:100%;font-weight:700;min-height:calc(4.3cqw * 1.3 + 4.4cqw)}
+.sub .w{opacity:.45;transition:opacity .12s linear}
+.sub .w.said{opacity:1}
+.sub.swap{animation:subin .22s ease-out both}
+@keyframes subin{from{opacity:.2;transform:translateY(1cqw)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.sub.swap{animation:none}.sub .w{transition:none}}
+.card{background:var(--paper);border-radius:4.2cqw;padding:3.8cqw 4.2cqw;box-shadow:0 2.4cqw 7cqw rgba(38,50,79,.2);border:1px solid rgba(38,50,79,.08)}
+.card .tagline{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;color:var(--accent-text);font-size:3.3cqw;margin-bottom:.8cqw}
+.card h2{font-size:5.6cqw;font-weight:800;line-height:1.08}
+.card .note{font-size:3.3cqw;color:var(--muted);font-weight:600;margin-top:.8cqw}
+.card ol{list-style:none;display:grid;gap:1.35cqw;margin-top:2.4cqw}
+.card li{display:flex;align-items:center;gap:2.4cqw;font-size:3.5cqw;font-weight:600;opacity:.32;transform:translateX(-1.6cqw);transition:opacity .35s ease, transform .45s cubic-bezier(.2,.9,.3,1.3)}
+.card li.on{opacity:1;transform:none}
+.card li .n{flex:none;width:5.4cqw;height:5.4cqw;border-radius:50%;background:#59617a;color:#fff;font-weight:800;font-size:2.8cqw;display:grid;place-items:center;transition:background .3s}
+.card li.on .n{background:var(--accent)}
+.card li .q{margin-left:auto;font-weight:800;color:var(--accent-text);white-space:nowrap;padding-left:2cqw}
+.card.act h2{font-size:8.4cqw;line-height:1}
+.card.act .desc{font-size:3.9cqw;color:var(--muted);line-height:1.4;margin-top:1.8cqw;font-weight:600}
+
+.title{text-align:center;background:rgba(255,253,248,.92);border-radius:5cqw;padding:5cqw 4cqw;box-shadow:0 2.4cqw 7cqw rgba(38,50,79,.15)}
+.title h1{font-size:10cqw;line-height:.98;font-weight:800;letter-spacing:-.02em}
+.title p{margin-top:2.2cqw;font-size:3.9cqw;color:var(--muted);font-weight:600}
+.title .actions{display:grid;gap:2.4cqw;margin-top:4cqw}
+.title .actions .row{display:flex;gap:2.4cqw}
+.title .actions .btn{margin-top:0}
+.title .actions small{display:block;font-size:3cqw;font-weight:600;opacity:.85;margin-top:.4cqw}
+.btn svg{width:1.15em;height:1.15em;vertical-align:-.2em;margin-right:.45em}
+.btn:disabled{opacity:.7;cursor:progress}
+
+.show{animation:rise .55s cubic-bezier(.2,.9,.3,1.15) both}
+@keyframes rise{from{opacity:0;transform:translateY(5cqw)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.show{animation:none}.card li{transition:none}}
+
+/* configurateur */
+.start{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:4.5cqw;background:linear-gradient(to bottom, rgba(247,241,230,0) 25%, rgba(247,241,230,.55) 60%)}
+.box{background:var(--paper);border-radius:5.5cqw;padding:5.6cqw 5.6cqw 5cqw;box-shadow:0 3cqw 9cqw rgba(38,50,79,.28);width:100%}
+.box h1{font-size:7.6cqw;line-height:1;font-weight:800;letter-spacing:-.02em}
+.box .lead{font-size:3.6cqw;color:var(--muted);line-height:1.4;margin-top:1.6cqw;font-weight:600}
+.stepper{display:flex;align-items:center;justify-content:space-between;padding:2.4cqw 0;border-bottom:1px solid rgba(38,50,79,.1)}
+.stepper:first-of-type{margin-top:2.4cqw;border-top:1px solid rgba(38,50,79,.1)}
+.st-label span{display:block;font-weight:800;font-size:4.5cqw}
+.st-label small{display:block;font-size:3.1cqw;color:var(--muted);font-weight:600;margin-top:.3cqw}
+.st-ctrl{display:flex;align-items:center;gap:2.6cqw}
+.st-btn{width:max(44px,11cqw);height:max(44px,11cqw);border-radius:50%;border:2px solid rgba(38,50,79,.28);background:#fff;font:inherit;font-size:6.4cqw;font-weight:600;color:var(--ink);cursor:pointer;display:grid;place-items:center;line-height:1}
+.st-btn:disabled{opacity:.35;cursor:not-allowed}
+.st-ctrl output{min-width:7cqw;text-align:center;font-size:7cqw;font-weight:800}
+.seg{border:0;margin-top:3cqw}
+.seg legend{font-weight:800;font-size:4.2cqw;margin-bottom:1.8cqw}
+.seg .opts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6cqw}
+.seg label{position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:flex;align-items:center;justify-content:center;text-align:center;min-height:max(44px,11cqw);padding:1.6cqw;border-radius:3cqw;background:var(--chip);font-weight:700;font-size:3.4cqw;line-height:1.15;border:2px solid transparent;transition:background .2s,color .2s}
+.seg input:checked+span{background:var(--ink);color:#fff}
+.preview{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6cqw;margin-top:3cqw}
+.preview div{border:2px solid var(--chip);border-radius:3cqw;padding:2cqw 1.4cqw;text-align:center}
+.preview dt{font-size:2.9cqw;color:var(--muted);font-weight:700;line-height:1.2}
+.preview dd{font-size:4.4cqw;font-weight:800;margin-top:.6cqw;color:var(--ink);white-space:nowrap}
+.dur{margin-top:3cqw;--th:max(28px,7cqw);--f:0}
+.dur-head{display:flex;align-items:baseline;justify-content:space-between}
+.dur-head output{font-size:6cqw;font-weight:800;white-space:nowrap}
+.dur input{-webkit-appearance:none;appearance:none;display:block;width:100%;height:max(44px,10cqw);margin:0;background:transparent;cursor:pointer}
+.dur input::-webkit-slider-runnable-track{height:1.8cqw;border-radius:99px;background:linear-gradient(to right,var(--accent) 0 calc(var(--th) / 2 + (100% - var(--th)) * var(--f)),var(--chip) 0)}
+.dur input::-moz-range-track{height:1.8cqw;border-radius:99px;background:var(--chip)}
+.dur input::-moz-range-progress{height:1.8cqw;border-radius:99px;background:var(--accent)}
+.dur input::-webkit-slider-thumb{-webkit-appearance:none;width:var(--th);height:var(--th);margin-top:calc((1.8cqw - var(--th)) / 2);border-radius:50%;background:#fff;border:.9cqw solid var(--accent);box-shadow:0 .6cqw 1.6cqw rgba(38,50,79,.25)}
+.dur input::-moz-range-thumb{box-sizing:border-box;width:var(--th);height:var(--th);border-radius:50%;background:#fff;border:.9cqw solid var(--accent);box-shadow:0 .6cqw 1.6cqw rgba(38,50,79,.25)}
+.dur-ticks{position:relative;height:3.6cqw;font-size:2.9cqw;color:var(--muted);font-weight:700}
+.dur-ticks span{position:absolute;top:0;left:calc(var(--th) / 2 + (100% - var(--th)) * var(--p));transform:translateX(-50%);white-space:nowrap}
+.toggle{display:flex;align-items:center;gap:2.4cqw;font-weight:700;font-size:3.6cqw;margin-top:3cqw;cursor:pointer;min-height:44px}
+.toggle input{width:max(20px,5.2cqw);height:max(20px,5.2cqw);accent-color:var(--accent);flex:none}
+.btn{display:block;width:100%;margin-top:2.4cqw;padding:3.4cqw;border-radius:99px;border:0;font:inherit;font-weight:700;font-size:4.1cqw;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);color:#fff;box-shadow:0 1.2cqw 3cqw rgba(210,74,28,.35)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid rgba(38,50,79,.3)}
+.stage.configuring .bottom,.stage.configuring .badges,.stage.configuring .controls,.stage.configuring .progress,.stage.configuring .hud{visibility:hidden}
+</style>
+</head>
+<body>
+<main class="stage configuring" id="stage">
+  <div class="hud" aria-hidden="true">
+    <div class="brand"><small id="hudKit">Kit d'urgence 72 h</small><strong id="hudFam">2 adultes, 3 enfants</strong></div>
+    <div class="pill" id="pill">72 h</div>
+  </div>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+  <div class="controls" id="controls">
+    <div class="grp">
+      <button id="bSpeed" class="wide" type="button"></button>
+      <button id="bSkip" class="wide" type="button" aria-label="Passer à la fin et aux listes">Passer<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5.5v13a1 1 0 0 0 1.5.86L15 13.2V18a1 1 0 0 0 2 0V6a1 1 0 0 0-2 0v4.8L5.5 4.64A1 1 0 0 0 4 5.5z"/></svg></button>
+    </div>
+    <div class="grp">
+      <button id="bPlay" type="button" aria-label="Mettre en pause"></button>
+      <button id="bVoice" type="button" aria-label="Couper la voix off"></button>
+      <button id="bReplay" type="button" aria-label="Revoir depuis le début"></button>
+      <button id="bConfig" type="button" aria-label="Modifier le foyer"></button>
+    </div>
+  </div>
+
+  <div class="badges" id="badges" aria-hidden="true"></div>
+
+  <div class="bottom">
+    <div class="title" id="intro" hidden>
+      <h1>Kit d'urgence<br><span id="introDur">72 heures</span></h1>
+      <p id="introFam"></p>
+    </div>
+    <div class="title" id="outro" hidden>
+      <h1>Prêts.<br>Ensemble.</h1>
+      <p>Préparez votre kit dès aujourd'hui.</p>
+      <div class="actions" id="outroActions" hidden>
+        <button class="btn primary" id="bPdf" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg><span id="bPdfLabel">Télécharger mes listes (PDF)</span><small>à cocher et à imprimer</small></button>
+        <div class="row">
+          <button class="btn ghost" id="bAgain" type="button">Revoir</button>
+          <button class="btn ghost" id="bEdit" type="button">Modifier le foyer</button>
+        </div>
+      </div>
+    </div>
+    <p class="sub" id="sub" aria-live="polite" hidden></p>
+    <section class="card" id="card" hidden aria-live="polite"></section>
+  </div>
+
+  <div class="start" id="start">
+    <div class="box" id="cfg" role="region" aria-labelledby="cfgTitle">
+      <h1 id="cfgTitle">Kit d'urgence 72&nbsp;heures</h1>
+      <p class="lead">Indiquez qui vit chez vous. Les quantités, les sacs et l'animation s'adaptent.</p>
+
+      <div class="stepper">
+        <div class="st-label"><span id="lblA">Adultes</span><small>ados compris</small></div>
+        <div class="st-ctrl" role="group" aria-labelledby="lblA">
+          <button type="button" class="st-btn" data-k="a" data-d="-1" aria-label="Retirer un adulte">−</button>
+          <output id="outA" aria-live="polite" aria-atomic="true"></output>
+          <button type="button" class="st-btn" data-k="a" data-d="1" aria-label="Ajouter un adulte">+</button>
+        </div>
+      </div>
+      <div class="stepper">
+        <div class="st-label"><span id="lblE">Enfants</span><small>moins de 12 ans, sac léger</small></div>
+        <div class="st-ctrl" role="group" aria-labelledby="lblE">
+          <button type="button" class="st-btn" data-k="e" data-d="-1" aria-label="Retirer un enfant">−</button>
+          <output id="outE" aria-live="polite" aria-atomic="true"></output>
+          <button type="button" class="st-btn" data-k="e" data-d="1" aria-label="Ajouter un enfant">+</button>
+        </div>
+      </div>
+
+      <fieldset class="seg">
+        <legend>Que voulez-vous préparer ?</legend>
+        <div class="opts">
+          <label><input type="radio" name="mode" value="both"><span>Les deux</span></label>
+          <label><input type="radio" name="mode" value="home"><span>Rester chez soi</span></label>
+          <label><input type="radio" name="mode" value="evac"><span>Évacuer</span></label>
+        </div>
+      </fieldset>
+
+      <div class="dur" id="durRow">
+        <div class="dur-head">
+          <label class="st-label" for="dur"><span>Durée à tenir</span><small>réserve à la maison</small></label>
+          <output id="outD" for="dur"></output>
+        </div>
+        <input type="range" id="dur" min="3" max="21" step="1" value="3">
+        <div class="dur-ticks" aria-hidden="true"><span style="--p:0">72 h</span><span style="--p:.2222">1 sem.</span><span style="--p:.6111">2 sem.</span><span style="--p:1">3 sem.</span></div>
+      </div>
+
+      <dl class="preview" id="preview"></dl>
+
+      <label class="toggle" id="voiceRow"><input type="checkbox" id="voice"> Voix off</label>
+      <button class="btn primary" type="button" id="bLaunch">Lancer l'animation</button>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+"use strict";
+
+/* ---------- utilitaires ---------- */
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const eIO = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const eOut = u => 1 - Math.pow(1 - u, 3);
+const eIn = u => u * u * u;
+const eBack = u => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); };
+const eBounce = u => { const n = 7.5625, d = 2.75;
+  if (u < 1 / d) return n * u * u;
+  if (u < 2 / d) return n * (u -= 1.5 / d) * u + .75;
+  if (u < 2.5 / d) return n * (u -= 2.25 / d) * u + .9375;
+  return n * (u -= 2.625 / d) * u + .984375; };
+const fr = v => String(v).replace('.', ',');
+const WF = ['zéro','une','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze'];
+const WM = ['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze'];
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const pl = (n, s, p) => n > 1 ? p : s;
+/* durée à tenir chez soi : de 3 jours (72 h) à 3 semaines, au jour près */
+const D_MIN = 3, D_MAX = 21;
+const durTxt = (d, words) => d === 3 ? '72 heures' : d % 7 ? `${d} jours` : `${words ? WF[d / 7] : d / 7} ${pl(d / 7, 'semaine', 'semaines')}`;
+const durShort = d => d === 3 ? '72 h' : durTxt(d);
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- scène ---------- */
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.domElement.setAttribute('aria-hidden', 'true');
+stage.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const world = new THREE.Group();
+scene.add(world);
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 300);
+const OFF = new THREE.Vector3(26, 30, 26);
+
+scene.add(new THREE.HemisphereLight(0xfff6e8, 0xb9a487, 0.72));
+const sun = new THREE.DirectionalLight(0xffffff, 0.95);
+sun.position.set(14, 26, 9);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 75 });
+sun.shadow.bias = -0.0006;
+sun.shadow.normalBias = 0.02;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xdfe8ff, 0.28);
+fill.position.set(-16, 10, 14);
+scene.add(fill);
+
+/* ---------- briques low poly ---------- */
+const MATS = {};
+function mat(c, o = {}) {
+  const k = c + JSON.stringify(o);
+  if (!MATS[k]) MATS[k] = new THREE.MeshStandardMaterial(Object.assign({ color: c, flatShading: true, roughness: .78, metalness: 0 }, o));
+  return MATS[k];
+}
+function mesh(geo, c, o) { const m = new THREE.Mesh(geo, mat(c, o)); m.castShadow = true; m.receiveShadow = true; return m; }
+function B(w, h, d, c, x = 0, y = 0, z = 0, o) { const m = mesh(new THREE.BoxGeometry(w, h, d), c, o); m.position.set(x, y + h / 2, z); return m; }
+function C(r1, r2, h, c, x = 0, y = 0, z = 0, seg = 8, o) { const m = mesh(new THREE.CylinderGeometry(r1, r2, h, seg), c, o); m.position.set(x, y + h / 2, z); return m; }
+function CL(r, len, c, x = 0, y = 0, z = 0, axis = 'z', seg = 8, o) {
+  const m = mesh(new THREE.CylinderGeometry(r, r, len, seg), c, o);
+  if (axis === 'z') m.rotation.x = Math.PI / 2; else m.rotation.z = Math.PI / 2;
+  m.position.set(x, y + r, z); return m;
+}
+function TF(R, r, c, x = 0, y = 0, z = 0, o) { const m = mesh(new THREE.TorusGeometry(R, r, 5, 14), c, o); m.rotation.x = Math.PI / 2; m.position.set(x, y + r, z); return m; }
+function S(r, c, x = 0, y = 0, z = 0, detail = 0, o) { const m = mesh(new THREE.IcosahedronGeometry(r, detail), c, o); m.position.set(x, y, z); return m; }
+function G(...kids) { const g = new THREE.Group(); kids.forEach(k => g.add(k)); return g; }
+function grid(count, cols, dx, dz, fn) {
+  const g = G(); cols = Math.min(cols, count); const rows = Math.ceil(count / cols);
+  for (let i = 0; i < count; i++) { const c = i % cols, r = Math.floor(i / cols); fn(g, (c - (cols - 1) / 2) * dx, (r - (rows - 1) / 2) * dz, i); }
+  return g;
+}
+const cyc = (arr, i) => arr[i % arr.length];
+const qn = (n, lo, hi) => Math.min(hi, Math.max(lo, n | 0));
+
+const P = { navy:'#26324f', orange:'#ef6a2e', red:'#d9473f', blue:'#4c9ee0', sky:'#9fd3f0', yellow:'#f2b33d', gold:'#e2b544',
+  green:'#4f9d69', mint:'#7cc7a1', purple:'#7d6bc2', pink:'#ec8fae', brown:'#a8754b', white:'#fbfaf6', paper:'#f1ebdf',
+  steel:'#b7bfc8', dark:'#323947', cream:'#fbf6ec' };
+const METAL = { metalness: .55, roughness: .35 };
+const GLOW = c => ({ emissive: c, emissiveIntensity: .7 });
+
+/* ---------- objets du kit ---------- */
+const BLD = {
+  water(n = 4) { const k = qn(n, 2, 12);
+    return grid(k, 4, 0.84, 0.72, (g, x, z) => {
+      g.add(B(0.72, 1.3, 0.6, P.blue, x, 0, z, { transparent: true, opacity: .93 }));
+      g.add(B(0.74, 0.34, 0.62, P.white, x, 0.42, z));
+      g.add(C(0.12, 0.12, 0.18, P.navy, x + 0.16, 1.3, z - 0.1));
+      g.add(B(0.12, 0.16, 0.36, P.navy, x - 0.17, 1.3, z)); }); },
+  bottle() { return G(C(0.24, 0.24, 1.15, P.blue, 0, 0, 0, 10, { transparent: true, opacity: .9 }), C(0.245, 0.245, 0.36, P.white, 0, 0.36, 0, 10),
+    C(0.12, 0.2, 0.18, P.blue, 0, 1.15, 0, 10, { transparent: true, opacity: .9 }), C(0.12, 0.12, 0.14, P.navy, 0, 1.33, 0, 8)); },
+  flask() { return G(C(0.24, 0.24, 0.78, P.mint, 0, 0, 0, 10), C(0.245, 0.245, 0.1, P.white, 0, 0.5, 0, 10), C(0.15, 0.15, 0.16, P.orange, 0, 0.78, 0, 8),
+    TF(0.11, 0.03, P.orange, 0.18, 0.92, 0)); },
+  cans() { const g = G(); const cols = [P.red, P.green, P.yellow];
+    [[-0.38, -0.25], [0.38, -0.25], [0, 0.4]].forEach(([x, z], i) => {
+      g.add(C(0.3, 0.3, 0.55, P.steel, x, 0, z, 10, METAL)); g.add(C(0.305, 0.305, 0.33, cols[i], x, 0.11, z, 10)); });
+    g.add(C(0.3, 0.3, 0.55, P.steel, -0.38, 0.55, -0.25, 10, METAL)); g.add(C(0.305, 0.305, 0.33, P.orange, -0.38, 0.66, -0.25, 10));
+    return g; },
+  meals() { return G(B(1.2, 0.28, 0.8, P.yellow), B(1.21, 0.05, 0.81, P.white, 0, 0.12, 0), B(1.1, 0.28, 0.74, P.green, 0.04, 0.28, 0.02),
+    B(0.5, 0.02, 0.3, P.white, 0.2, 0.56, 0.1), B(0.3, 0.02, 0.2, P.red, -0.3, 0.56, -0.15)); },
+  bars() { const g = G(); [P.orange, P.purple, P.red, P.green].forEach((c, i) => g.add(B(0.24, 0.12, 0.8, c, -0.45 + i * 0.3, 0, -0.15)));
+    g.add(B(0.95, 0.18, 0.34, P.brown, 0, 0, 0.5)); g.add(B(0.4, 0.02, 0.2, P.paper, 0, 0.18, 0.5)); return g; },
+  snacks() { return G(B(0.24, 0.12, 0.7, P.purple, -0.42, 0, 0), B(0.24, 0.12, 0.7, P.orange, -0.12, 0, 0),
+    B(0.36, 0.5, 0.14, P.green, 0.32, 0, 0.1), C(0.08, 0.08, 0.14, P.white, 0.32, 0.5, 0.1, 6), S(0.15, P.red, 0.1, 0.15, -0.4, 0)); },
+  opener() { return G(B(0.16, 0.1, 0.85, P.red, -0.13, 0, 0.15), B(0.16, 0.1, 0.85, P.red, 0.13, 0, 0.15),
+    C(0.2, 0.2, 0.12, P.steel, 0, 0, -0.42, 10, METAL), B(0.12, 0.08, 0.32, P.steel, 0.27, 0.02, -0.42, METAL)); },
+  cutlery(n = 3) { const k = qn(n, 1, 6);
+    const g = grid(k, 3, 0.7, 0.66, (g, x, z, i) => { g.add(C(0.24, 0.18, 0.45, cyc([P.orange, P.blue, P.mint, P.pink, P.yellow, P.purple], i), x, 0, z, 9)); g.add(C(0.2, 0.2, 0.01, '#3a3f4d', x, 0.445, z, 9)); });
+    const w = (Math.min(k, 3) - 1) * 0.35 + 0.55;
+    g.add(B(0.08, 0.05, 0.9, P.steel, w, 0, 0, METAL)); g.add(B(0.08, 0.05, 0.9, P.steel, -w, 0, 0, METAL)); return g; },
+
+  firstaid() { return G(B(1.25, 0.6, 0.85, P.red), B(1.27, 0.08, 0.87, '#b8362f', 0, 0.26, 0),
+    B(0.55, 0.02, 0.16, P.white, 0, 0.6, 0), B(0.16, 0.02, 0.55, P.white, 0, 0.6, 0), B(0.5, 0.1, 0.08, P.navy, 0, 0.6, -0.34)); },
+  meds() { const g = G(C(0.22, 0.22, 0.55, P.orange, -0.28, 0, -0.15, 9), C(0.24, 0.24, 0.14, P.white, -0.28, 0.55, -0.15, 9),
+    B(0.62, 0.05, 0.42, P.steel, 0.28, 0, 0.3, METAL));
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) g.add(S(0.05, P.white, 0.12 + c * 0.16, 0.07, 0.2 + r * 0.18));
+    return g; },
+  glasses() { return G(TF(0.24, 0.05, P.navy, -0.28, 0, 0), TF(0.24, 0.05, P.navy, 0.28, 0, 0),
+    C(0.21, 0.21, 0.02, P.sky, -0.28, 0.04, 0, 12, { transparent: true, opacity: .6 }), C(0.21, 0.21, 0.02, P.sky, 0.28, 0.04, 0, 12, { transparent: true, opacity: .6 }),
+    B(0.14, 0.06, 0.06, P.navy, 0, 0.02, 0), B(0.05, 0.05, 0.7, P.navy, -0.5, 0, -0.4), B(0.05, 0.05, 0.7, P.navy, 0.5, 0, -0.4)); },
+  tp() { const g = G(); [-0.36, 0.36].forEach(x => { g.add(C(0.33, 0.33, 0.6, P.white, x, 0, -0.1, 10)); g.add(C(0.11, 0.11, 0.61, '#c9b38a', x, 0, -0.1, 8)); });
+    g.add(CL(0.2, 0.9, P.white, 0, 0, 0.5, 'x', 10)); return g; },
+  brushes(n = 4) { const k = qn(n, 1, 8); const g = G();
+    for (let i = 0; i < k; i++) { const x = (i - (k - 1) / 2) * 0.26, c = cyc([P.red, P.blue, P.green, P.yellow, P.pink, P.purple, P.orange, P.mint], i);
+      g.add(B(0.1, 0.07, 0.9, c, x, 0, 0.05)); g.add(B(0.1, 0.1, 0.2, P.white, x, 0.07, -0.3)); } return g; },
+  wcbags() { const g = G(); const s = S(0.42, P.dark, -0.15, 0.25, 0.05, 0); s.scale.set(1, 0.6, 1.1); g.add(s);
+    g.add(CL(0.17, 0.75, '#5b6472', 0.45, 0, -0.05, 'z', 8)); g.add(B(0.3, 0.02, 0.2, P.yellow, -0.15, 0.48, 0.1)); return g; },
+
+  torches(n = 2) { const k = qn(n, 1, 6);
+    return grid(k, 3, 0.62, 1.2, (g, x, z, i) => {
+      g.add(CL(0.14, 0.75, cyc([P.orange, P.navy, P.green], i), x, 0, z, 'z', 8));
+      const h = mesh(new THREE.CylinderGeometry(0.22, 0.14, 0.28, 8), P.dark); h.rotation.x = Math.PI / 2; h.position.set(x, 0.22, z + 0.5); g.add(h);
+      const l = mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.03, 8), '#fff6c2', GLOW('#ffe27a')); l.rotation.x = Math.PI / 2; l.position.set(x, 0.22, z + 0.65); g.add(l); }); },
+  headlamps(n = 1) { const k = qn(n, 1, 6);
+    return grid(k, 3, 0.72, 0.8, (g, x, z, i) => {
+      g.add(TF(0.27, 0.06, cyc([P.pink, P.mint, P.yellow, P.sky], i), x, 0, z)); g.add(B(0.24, 0.17, 0.14, P.dark, x, 0, z + 0.3));
+      g.add(B(0.15, 0.1, 0.02, '#fff6c2', x, 0.035, z + 0.38, GLOW('#ffe27a'))); }); },
+  radio() { const g = G(B(1.1, 0.7, 0.5, P.orange), B(1.12, 0.12, 0.52, P.navy, 0, 0.7, 0));
+    const sp = mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.04, 10), P.dark); sp.rotation.x = Math.PI / 2; sp.position.set(-0.22, 0.36, 0.26); g.add(sp);
+    g.add(B(0.36, 0.2, 0.04, '#1d2232', 0.25, 0.3, 0.25)); g.add(B(0.3, 0.13, 0.02, '#bfe6c8', 0.25, 0.335, 0.28, GLOW('#7fd39a')));
+    const an = mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.9, 5), P.steel, METAL); an.position.set(0.5, 1.15, -0.15); an.rotation.z = -0.5; g.add(an);
+    g.add(B(0.08, 0.32, 0.08, P.dark, 0.6, 0.2, 0)); g.add(B(0.08, 0.08, 0.26, P.dark, 0.62, 0.45, 0.1)); return g; },
+  batteries() { const g = G(); for (let r = 0; r < 2; r++) for (let c = 0; c < 5; c++) { const x = -0.48 + c * 0.24, z = -0.18 + r * 0.38;
+      g.add(C(0.09, 0.09, 0.36, r ? P.dark : '#2f6f4f', x, 0, z, 8)); g.add(C(0.092, 0.092, 0.1, P.gold, x, 0.26, z, 8, METAL)); g.add(C(0.035, 0.035, 0.04, P.steel, x, 0.36, z, 6)); }
+    return g; },
+  powerbank() { const g = G(B(0.62, 0.22, 1.0, '#3d4a63'), B(0.63, 0.04, 1.01, P.orange, 0, 0.09, 0));
+    [0, 1, 2, 3].forEach(i => g.add(B(0.06, 0.02, 0.06, i < 3 ? '#7fd39a' : '#55606f', -0.12 + i * 0.09, 0.22, 0.38, i < 3 ? GLOW('#7fd39a') : undefined)));
+    g.add(TF(0.18, 0.03, P.white, 0.55, 0, -0.25)); return g; },
+
+  blankets(n = 1) { const k = qn(n, 1, 8); const g = G();
+    for (let i = 0; i < k; i++) g.add(B(0.85, 0.09, 0.6, i % 2 ? '#cfd6dd' : P.gold, -0.04 + (i % 3) * 0.04, i * 0.09, 0, METAL));
+    g.add(B(0.4, 0.01, 0.2, P.red, 0.04, k * 0.09, 0.1)); return g; },
+  clothes(n = 2) { const k = qn(n, 1, 6); const g = G();
+    for (let i = 0; i < k; i++) g.add(B(1.1 - i * 0.03, 0.2, 0.85 - i * 0.01, cyc([P.purple, P.red, P.blue, P.green, P.orange, P.navy], i), 0, i * 0.2, 0));
+    g.add(B(0.98, 0.04, 0.12, '#1f5f9a', 0, k * 0.2, -0.3)); return g; },
+  outfit() { const g = G(B(1.1, 0.2, 0.85, P.navy), B(1.06, 0.2, 0.82, P.red, 0, 0.2, 0), B(1.12, 0.16, 0.86, P.yellow, 0, 0.4, 0), B(0.3, 0.02, 0.5, '#d99a1f', -0.3, 0.56, 0));
+    const hat = S(0.26, P.purple, 0.3, 0.62, 0.05, 1); hat.scale.set(1, 0.7, 1); g.add(hat); g.add(TF(0.24, 0.05, P.purple, 0.3, 0.52, 0.05)); return g; },
+  sleepingbag(n = 1) { const k = qn(n, 1, 4);
+    return grid(k, 2, 1.3, 0.9, (g, x, z, i) => { const c = cyc([P.green, P.blue, P.purple, P.orange], i);
+      g.add(CL(0.36, 1.1, c, x, 0, z, 'x', 10)); g.add(CL(0.2, 1.12, shade(c, .7), x, 0.16, z, 'x', 10));
+      [-0.3, 0.3].forEach(dx => g.add(CL(0.375, 0.08, P.dark, x + dx, -0.015, z, 'x', 10))); }); },
+  toiletkit() { const g = G(B(0.95, 0.42, 0.6, P.sky), B(0.97, 0.06, 0.62, P.navy, 0, 0.36, 0), B(0.12, 0.08, 0.06, P.gold, 0.3, 0.38, 0.31, METAL),
+      B(0.08, 0.06, 0.7, P.mint, -0.15, 0.42, -0.05), B(0.08, 0.08, 0.16, P.white, -0.15, 0.48, -0.35), B(0.5, 0.06, 0.32, P.white, 0.15, 0, 0.6));
+    [-0.12, 0.42].forEach(x => g.add(TF(0.08, 0.012, P.white, x, 0, 0.6))); return g; },
+  map() { const g = G(); [P.paper, '#e8dcc4', P.paper].forEach((c, i) => { const p = B(0.36, 0.03, 0.85, c, -0.36 + i * 0.36, 0.02, 0); p.rotation.z = (i % 2 ? -1 : 1) * 0.1; g.add(p); });
+    g.add(B(0.3, 0.005, 0.3, P.green, -0.36, 0.06, 0.12), B(0.12, 0.005, 0.5, P.blue, 0, 0.06, -0.1), S(0.07, P.red, 0.36, 0.1, -0.2));
+    g.add(B(0.4, 0.03, 0.26, P.white, 0.05, 0, 0.62)); for (let j = 0; j < 3; j++) g.add(B(0.28, 0.005, 0.03, P.navy, 0.05, 0.03, 0.54 + j * 0.07));
+    g.add(CL(0.04, 0.8, P.navy, 0.62, 0, 0.1, 'z', 6)); return g; },
+  stove() { const g = G(C(0.28, 0.28, 0.5, P.red, -0.38, 0, 0, 12), C(0.12, 0.12, 0.08, P.steel, -0.38, 0.5, 0, 8, METAL),
+      C(0.36, 0.3, 0.16, P.dark, 0.25, 0, 0, 10), C(0.22, 0.22, 0.04, '#3a3f4d', 0.25, 0.16, 0, 10), TF(0.3, 0.025, P.steel, 0.25, 0.2, 0), B(0.4, 0.04, 0.06, P.steel, -0.08, 0.1, 0, METAL));
+    [0, 1, 2].forEach(i => { const an = i * 2.094; g.add(B(0.05, 0.12, 0.05, P.steel, 0.25 + Math.cos(an) * 0.24, 0.16, Math.sin(an) * 0.24, METAL)); });
+    const f = mesh(new THREE.ConeGeometry(0.12, 0.22, 8), '#6fb6ff', GLOW('#6fb6ff')); f.position.set(0.25, 0.3, 0); g.add(f); return g; },
+  kidclothes() { return G(B(0.7, 0.16, 0.6, P.pink, -0.3, 0, -0.1), B(0.66, 0.16, 0.56, P.yellow, -0.3, 0.16, -0.1),
+    B(0.26, 0.12, 0.36, P.white, 0.35, 0, -0.25), B(0.26, 0.12, 0.36, P.sky, 0.35, 0, 0.25)); },
+
+  pouch() { return G(B(0.9, 0.05, 0.62, P.white, 0, 0.02, 0.04), B(0.5, 0.02, 0.3, P.blue, 0.1, 0.07, 0.1),
+    B(1.15, 0.14, 0.85, P.sky, 0, 0, 0, { transparent: true, opacity: .45 }), B(1.17, 0.16, 0.08, P.blue, 0, 0, -0.4)); },
+  papers() { const g = G(); for (let i = 0; i < 3; i++) g.add(B(0.78, 0.03, 1.05, i % 2 ? P.paper : P.white, -0.12 + i * 0.06, i * 0.03, -0.05 + i * 0.04));
+    for (let k = 0; k < 4; k++) g.add(B(0.48 - k * 0.06, 0.004, 0.04, '#9aa3ad', 0.0, 0.09, -0.3 + k * 0.12));
+    g.add(B(0.52, 0.05, 0.33, P.blue, 0.32, 0.09, 0.38)); g.add(B(0.14, 0.01, 0.18, P.white, 0.2, 0.14, 0.38)); return g; },
+  cash() { const g = G(B(0.95, 0.22, 0.48, '#7db687', 0, 0, -0.15), B(0.16, 0.23, 0.5, '#efe3c3', 0, 0, -0.15));
+    [[-0.3, 0.4], [0, 0.42], [0.3, 0.38]].forEach(([x, z], i) => g.add(C(0.13, 0.13, 0.05 + i * 0.03, P.gold, x, 0, z, 10, METAL))); return g; },
+  keys() { const g = G(TF(0.2, 0.035, P.steel, 0, 0, -0.25, METAL));
+    [[-0.2, P.gold], [0.05, P.steel], [0.3, P.gold]].forEach(([x, c]) => { g.add(C(0.11, 0.11, 0.05, c, x, 0, 0.1, 8, METAL)); g.add(B(0.06, 0.05, 0.42, c, x, 0, 0.4, METAL)); });
+    g.add(B(0.3, 0.06, 0.2, P.red, -0.3, 0, -0.45)); return g; },
+
+  teddy(n = 1) { const k = qn(n, 1, 3); const g = G();
+    for (let i = 0; i < k; i++) { const o = (i - (k - 1) / 2) * 0.9, fur = cyc([P.brown, '#c58b5a', '#8f6240'], i);
+      const b = S(0.36, fur, o, 0.36, 0, 1); b.scale.set(1, 1.05, 0.9); g.add(b);
+      g.add(S(0.28, fur, o, 0.9, 0.02, 1)); g.add(S(0.1, fur, o - 0.21, 1.12, 0)); g.add(S(0.1, fur, o + 0.21, 1.12, 0));
+      g.add(S(0.12, '#d9b48f', o, 0.85, 0.24)); g.add(S(0.05, P.dark, o, 0.9, 0.34)); g.add(S(0.035, P.dark, o - 0.1, 0.98, 0.24)); g.add(S(0.035, P.dark, o + 0.1, 0.98, 0.24));
+      g.add(S(0.13, fur, o - 0.2, 0.13, 0.25)); g.add(S(0.13, fur, o + 0.2, 0.13, 0.25)); g.add(S(0.11, fur, o - 0.36, 0.45, 0.08)); g.add(S(0.11, fur, o + 0.36, 0.45, 0.08));
+      g.add(B(0.32, 0.08, 0.06, cyc([P.red, P.blue, P.green], i), o, 0.62, 0.27)); }
+    return g; },
+  games() { const g = G(B(0.55, 0.2, 0.75, P.red, -0.35, 0, -0.05), B(0.45, 0.02, 0.65, P.white, -0.35, 0.2, -0.05), B(0.12, 0.01, 0.12, P.red, -0.35, 0.22, -0.05));
+    [P.red, P.blue, P.yellow, P.green].forEach((c, i) => { const x = 0.16 + i * 0.13; g.add(CL(0.05, 0.62, c, x, 0, -0.05, 'z', 6));
+      const tip = mesh(new THREE.ConeGeometry(0.05, 0.14, 6), c); tip.rotation.x = Math.PI / 2; tip.position.set(x, 0.05, 0.33); g.add(tip); });
+    return g; },
+  tags(n = 1) { const k = qn(n, 1, 4);
+    return grid(k, 4, 0.6, 0.9, (g, x, z, i) => { const c = cyc([P.yellow, P.mint, P.pink, P.sky], i); g.add(B(0.48, 0.05, 0.75, c, x, 0, z));
+      for (let j = 0; j < 3; j++) g.add(B(0.3, 0.005, 0.04, P.navy, x, 0.05, z - 0.02 + j * 0.14)); g.add(TF(0.06, 0.015, P.navy, x, 0.05, z - 0.26)); }); },
+  knife() { return G(B(0.26, 0.18, 0.9, P.red, 0, 0, 0.1), B(0.07, 0.05, 0.62, P.steel, 0.02, 0.06, -0.6, METAL), B(0.1, 0.01, 0.1, P.white, 0, 0.18, 0.2), B(0.04, 0.01, 0.14, P.white, 0, 0.19, 0.2)); },
+  tape() { const g = G(); const t = mesh(new THREE.TorusGeometry(0.3, 0.14, 6, 14), P.steel); t.rotation.x = Math.PI / 2; t.position.y = 0.14; g.add(t);
+    g.add(B(0.3, 0.02, 0.22, '#8e97a2', 0.42, 0, 0.2)); return g; },
+  whistle() { return G(CL(0.17, 0.4, P.orange, 0.1, 0, 0, 'x', 10), B(0.38, 0.18, 0.22, P.orange, -0.25, 0.04, 0), B(0.1, 0.06, 0.1, P.dark, 0.05, 0.33, 0), TF(0.15, 0.03, P.navy, -0.6, 0, 0)); }
+};
+
+/* ---------- textures d'étiquettes ---------- */
+function labelTexture(lines, bg, fg) {
+  const cv = document.createElement('canvas'); cv.width = 512; cv.height = 256;
+  const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+  const draw = () => { const x = cv.getContext('2d'); x.fillStyle = bg; x.fillRect(0, 0, 512, 256); x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle';
+    lines.forEach(([txt, size, y]) => { do x.font = `800 ${size}px Outfit, system-ui, sans-serif`; while (x.measureText(txt).width > 480 && (size -= 4) > 20); x.fillText(txt, 256, y); }); tex.needsUpdate = true; };
+  draw(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  tex.relabel = l => { lines = l; draw(); };
+  return tex;
+}
+const patchMat = new THREE.MeshStandardMaterial({ map: labelTexture([['72 H', 150, 120], ['KIT FAMILLE', 34, 212]], '#26324f', '#fbf6ec'), roughness: .7 });
+const crateTex = labelTexture([['RÉSERVE', 96, 96], ['72 H', 80, 196]], '#fbf6ec', '#26324f');
+const crateMat = new THREE.MeshStandardMaterial({ map: crateTex, roughness: .7 });
+const shadowAll = o => o.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
+
+/* ---------- plateau ---------- */
+const ROWZ = [-3, -0.8, 1.4, 3.6, 5.8];
+const BACKZ = -7.2;
+const TINTS = ['#dbeaf4', '#f6dfda', '#f8ebcd', '#e5e0f3', '#dcedde'];
+const platform = new THREE.Group();
+world.add(platform);
+platform.add(B(14.4, 0.5, 18.6, P.cream, 0, -0.5, 0.1));
+platform.add(B(14.8, 0.7, 19.0, P.navy, 0, -1.2, 0.1));
+const backStrip = B(13.4, 0.02, 3.4, '#ece1cc', 0, 0, BACKZ); backStrip.castShadow = false; platform.add(backStrip);
+const strips = ROWZ.map((z, i) => { const s = B(13.4, 0.02, 1.95, TINTS[i], 0, 0, z); s.castShadow = false; platform.add(s); return s; });
+(function blobShadow() {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d');
+  const g = x.createRadialGradient(128, 128, 10, 128, 128, 128);
+  g.addColorStop(0, 'rgba(60,45,25,.42)'); g.addColorStop(.6, 'rgba(60,45,25,.16)'); g.addColorStop(1, 'rgba(60,45,25,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(30, 34), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(0, -1.6, 0.1); platform.add(m);
+})();
+
+/* ---------- sac à dos (fabrique) ---------- */
+function shade(hex, f) { const c = new THREE.Color(hex); c.multiplyScalar(f); return '#' + c.getHexString(); }
+function makeBag(body, withPatch) {
+  const dark = shade(body, .84), trim = P.navy;
+  const g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
+  inner.add(B(3.0, 3.2, 2.0, body));
+  inner.add(B(3.06, 0.38, 2.06, trim));
+  inner.add(B(2.8, 0.03, 1.8, '#3a1d12', 0, 3.2, 0));
+  inner.add(B(2.2, 1.45, 0.42, dark, 0, 0.45, 1.18));
+  inner.add(B(2.22, 0.08, 0.44, trim, 0, 1.86, 1.18));
+  [-1.68, 1.68].forEach(x => { inner.add(B(0.36, 1.1, 1.2, dark, x, 0.4, 0)); inner.add(C(0.13, 0.13, 0.5, P.blue, x, 1.45, 0.1, 8)); });
+  [-0.9, 0.9].forEach(x => inner.add(B(0.16, 2.6, 0.1, '#f2e8cf', x, 0.4, 1.0)));
+  const handle = mesh(new THREE.TorusGeometry(0.35, 0.08, 5, 12, Math.PI), trim); handle.position.set(0, 3.2, -0.6); inner.add(handle);
+  const flap = new THREE.Group(); flap.position.set(0, 3.2, -1.0); inner.add(flap);
+  flap.add(B(3.1, 0.3, 2.12, shade(body, .92), 0, 0, 1.06));
+  flap.add(B(1.0, 0.32, 0.5, trim, 0, 0, 1.95));
+  shadowAll(g);
+  if (withPatch) { const p = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.75), patchMat); p.position.set(0, 1.12, 1.395); inner.add(p); }
+  return { g, inner, flap };
+}
+
+/* ---------- bac de réserve + palette d'eau ---------- */
+const crate = new THREE.Group(), crateInner = new THREE.Group(); crate.add(crateInner);
+crateInner.add(B(3.0, 1.5, 2.0, '#4f6f96'));
+crateInner.add(B(3.12, 0.14, 2.12, '#3d5a7e'));
+crateInner.add(B(3.12, 0.14, 2.12, '#3d5a7e', 0, 1.36, 0));
+[-1.56, 1.56].forEach(x => crateInner.add(B(0.1, 0.22, 0.8, P.dark, x, 1.0, 0)));
+const crateLabel = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.75), crateMat); crateLabel.position.set(0, 0.74, 1.012); crateInner.add(crateLabel);
+const lid = new THREE.Group(); lid.position.set(0, 1.5, -1.06); crateInner.add(lid);
+lid.add(B(3.16, 0.18, 2.16, '#5c7fa8', 0, 0, 1.08)); lid.add(B(0.8, 0.1, 0.3, P.dark, 0, 0.18, 1.08));
+shadowAll(crate); crateLabel.castShadow = false;
+crate.position.set(-4.0, 0, BACKZ); world.add(crate);
+const pallet = B(2.4, 0.16, 2.1, '#c49a6c', -0.9, 0, BACKZ); world.add(pallet);
+[-0.7, 0.7].forEach(z => { const s = B(2.4, 0.02, 0.3, '#a97f53', 0, 0.16, z); pallet.add(s); s.position.x = 0; s.position.z = z; s.position.y = 0.09; });
+
+const tplAdult = makeBag('#e8592a', true); tplAdult.g.position.set(2.7, 0, BACKZ); world.add(tplAdult.g);
+const tplKid = makeBag('#f2b33d', false); tplKid.g.position.set(5.35, 0, BACKZ); world.add(tplKid.g);
+const TPL_S = { adult: 0.6, kid: 0.45 };
+const DEST = { crate: [-4.0, 1.7, BACKZ], pallet: [-0.9, 0.17, BACKZ], adult: [2.7, 3.2 * TPL_S.adult + 0.1, BACKZ], kid: [5.35, 3.2 * TPL_S.kid + 0.1, BACKZ] };
+
+/* ---------- voix off : textes (un fichier audio par identifiant) ---------- */
+const VO = {
+  introN: "Votre foyer est-il prêt à tenir 72 heures ?",
+  intro1: "Êtes-vous prêt à tenir 72 heures ?",
+  actHome2: "Premier cas : on reste à la maison.",
+  actHome1: "On reste à la maison.",
+  h1: "L'eau : 6 à 9 litres par personne. Puis conserves, plats, barres, ouvre-boîte et gobelets.",
+  h1j: "L'eau : 2 à 3 litres par personne et par jour. Puis conserves, plats, barres, ouvre-boîte et gobelets.",
+  h2: "Trousse, médicaments, lunettes. Et si l'eau est coupée : papier, sacs pour toilettes, brosses.",
+  h3: "Une radio pour les consignes, des lampes pour chacun, des piles de rechange et une batterie.",
+  h4: "Couvertures de survie, jeux, ruban adhésif pour calfeutrer, et un couteau.",
+  h4L: "Couvertures de survie, sacs de couchage, un réchaud, des jeux, du ruban adhésif pour calfeutrer, et un couteau.",
+  h5: "Pochette étanche, copies des papiers, argent liquide, doubles des clés.",
+  packHome: "Tout va dans un bac. L'eau reste stockée à côté.",
+  actEvac2: "Deuxième cas : il faut partir. Un sac léger par personne.",
+  actEvac1: "Il faut partir : un sac léger, prêt près de la porte.",
+  e1N: "Chaque adulte : eau, repas pour 3 jours, lampe, vêtements chauds et de pluie, sac de couchage, couverture de survie, trousse de toilette et sifflet.",
+  e1One: "Votre sac : eau, repas pour 3 jours, lampe, vêtements chauds et de pluie, sac de couchage, couverture de survie, trousse de toilette et sifflet.",
+  e2N: "Les adultes se partagent papiers et clés, argent, contacts et carte, radio, trousse, batterie et couteau.",
+  e2One: "Ajoutez papiers et clés, argent, contacts et carte, radio, trousse, batterie et couteau.",
+  e3N: "Chaque enfant : gourde, goûters, doudou, lampe, couverture, un change chaud, et une étiquette avec vos numéros.",
+  e3One: "Votre enfant : gourde, goûters, doudou, lampe, couverture, un change chaud, et une étiquette avec vos numéros.",
+  packEvacN: "Tous les sacs sont prêts, près de la porte.",
+  packEvac1: "Votre sac est prêt, près de la porte.",
+  final: "Prêts, ensemble. Préparez votre kit dès aujourd'hui."
+};
+/* une accroche par durée : introN_10, intro1_10... (72 h garde introN et intro1) */
+for (let d = D_MIN + 1; d <= D_MAX; d++) {
+  VO['introN_' + d] = `Votre foyer est-il prêt à tenir ${durTxt(d, true)} ?`;
+  VO['intro1_' + d] = `Êtes-vous prêt à tenir ${durTxt(d, true)} ?`;
+}
+/* voix off : audio/voix.json = { "id": durée en secondes }, fichiers audio/<id>.mp3 */
+let VOICE = {}, hasVoice = false;
+function loadVoices() {
+  if (!window.fetch || location.protocol === 'about:') return Promise.resolve(false);
+  const ctl = window.AbortController ? new AbortController() : null;
+  const timer = setTimeout(() => ctl && ctl.abort(), 3000);
+  return fetch('audio/voix.json', { cache: 'no-cache', signal: ctl ? ctl.signal : undefined })
+    .then(r => r.ok ? r.json() : null)
+    .then(m => { clearTimeout(timer); if (!m) return false;
+      const v = {}; Object.keys(m).forEach(id => { const e = Array.isArray(m[id]) ? m[id] : [m[id], []];
+        if (VO[id] && e[0] > 0) v[id] = { src: 'audio/' + id + '.mp3', dur: +e[0], pauses: Array.isArray(e[1]) ? e[1] : [] }; });
+      VOICE = v; hasVoice = Object.keys(v).length > 0; return hasVoice; })
+    .catch(() => { clearTimeout(timer); return false; });
+}
+const CPS = 15.5;
+/* carte caractère -> temps : linéaire, recalée sur les vraies pauses de la voix */
+function timeMap(text, sd, pauses) {
+  const A = [[0, 0]];
+  if (pauses && pauses.length) {
+    let used = -1; const re = /[,.:;?!]\s+/g; let m;
+    while ((m = re.exec(text))) {
+      const c0 = m.index + 1, c1 = m.index + m[0].length, est = c0 / text.length * sd;
+      let best = -1, bd = 0.65;
+      pauses.forEach((pz, i) => { if (i <= used) return; const d = Math.abs(pz[0] - est); if (d < bd) { bd = d; best = i; } });
+      if (best >= 0 && pauses[best][0] > A[A.length - 1][1]) { used = best; A.push([c0, pauses[best][0]], [c1, pauses[best][1]]); }
+    }
+  }
+  A.push([text.length, sd]);
+  return pos => { for (let i = 1; i < A.length; i++) if (pos <= A[i][0]) { const [c0, t0] = A[i - 1], [c1, t1] = A[i]; return c1 === c0 ? t1 : t0 + (pos - c0) / (c1 - c0) * (t1 - t0); } return sd; };
+}
+function say(id) { const text = VO[id], v = VOICE[id], sd = v ? v.dur : text.length / CPS; return { id, text, sd, map: timeMap(text, sd, v && v.pauses) }; }
+function chunkText(text, sd, map) {
+  map = map || (pos => pos / text.length * sd);
+  text = text.replace(/ ([?:!;])/g, ' $1').replace(/(\d) (?=[a-zA-Z%])/g, '$1 ');
+  const parts = text.split(/(?<=[,.:;?!])\s+/), out = [];
+  let cur = '';
+  parts.forEach(p => { if (cur && (cur + ' ' + p).length > 44) { out.push(cur); cur = p; } else cur = cur ? cur + ' ' + p : p; });
+  if (cur) out.push(cur);
+  let acc = 0;
+  return out.map(c => {
+    const base = acc, s0 = map(base); acc += c.length + 1; const s1 = Math.min(sd, map(acc - 1));
+    let w = 0; const words = c.split(' ').map(x => { const ws = map(base + w); w += x.length + 1; return { x, ws }; });
+    return { text: c, s0, s1, words };
+  });
+}
+
+/* ---------- état dynamique ---------- */
+let ITEMS = [], LINEUP = [], SEGS = [], LINES = [], CK = [], K = {}, DUR = 50;
+const badgeLayer = document.getElementById('badges');
+const FLYDUR = 0.7;
+
+function kill(o) { o.traverse(m => { if (m.geometry) m.geometry.dispose(); }); if (o.parent) o.parent.remove(o); }
+function clearDyn() {
+  ITEMS.forEach(it => { kill(it.g); kill(it.ring); it.ring.material.dispose(); it.badge.remove(); });
+  LINEUP.forEach(b => kill(b.g));
+  ITEMS = []; LINEUP = [];
+}
+
+function addItems(seg, rowIdx, rel) {
+  const n = seg.items.length, dx = Math.min(2.2, 12.8 / n), foot = Math.min(1.8, dx - 0.3);
+  seg.refs = [];
+  seg.items.forEach(([key, name, qty, count], i) => {
+    const inner = BLD[key](count || undefined);
+    shadowAll(inner);
+    inner.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(inner), size = box.getSize(new THREE.Vector3());
+    inner.position.x = -(box.min.x + box.max.x) / 2; inner.position.z = -(box.min.z + box.max.z) / 2;
+    const s = Math.min(1, foot / Math.max(size.x, size.z), 1.7 / size.y);
+    const g = new THREE.Group(); g.add(inner); g.visible = false; world.add(g);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.78, 0.92, 28), new THREE.MeshBasicMaterial({ color: 0xd24a1c, transparent: true, opacity: 0, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.visible = false; world.add(ring);
+    const badge = document.createElement('div'); badge.className = 'badge'; badge.textContent = i + 1; badgeLayer.appendChild(badge);
+    const it = { key, name, qty, g, ring, badge, seg, act: seg.act, s, h: size.y * s, x: (i - (n - 1) / 2) * dx, z: ROWZ[rowIdx],
+      tDrop: seg.start + rel[i], fly: Infinity, dest: null };
+    ring.position.set(it.x, 0.04, it.z);
+    ITEMS.push(it); seg.refs.push(it);
+  });
+}
+
+/* ---------- contenu des listes (animation et PDF) ----------
+   objet : [clé 3D, nom, quantité, nombre affiché en 3D, mot prononcé, précision pour le PDF] */
+const X = v => 'x' + v;
+function homeRows(a, e, d, withPapers) {
+  const n = a + e, nd = n * d, long = d >= 7;
+  const rows = [
+    { title: 'Eau et nourriture', voId: d === 3 ? 'h1' : 'h1j',
+      items: [['water', "Bidons d'eau de 5 L", `${2 * nd} à ${3 * nd} L`, Math.ceil(3 * nd / 5), "l'eau", '2 à 3 L par personne et par jour, pour boire et cuisiner'], ['cans', 'Conserves', X(nd), 0, 'conserves'], ['meals', 'Plats prêts à manger', X(nd), 0, 'plats', 'sans cuisson'],
+              ['bars', 'Barres et fruits secs', X(nd), 0, 'barres'], ['opener', 'Ouvre-boîte', 'x1', 0, 'ouvre-boîte', 'manuel'], ['cutlery', 'Couverts et gobelets', X(n), n, 'gobelets']] },
+    { title: 'Hygiène et santé', voId: 'h2',
+      items: [['firstaid', 'Trousse de secours', 'x1', 0, 'trousse', 'pansements, désinfectant, masques FFP2'], ['meds', 'Médicaments', `${durShort(d)} + ordonnances`, 0, 'médicaments', 'traitements en cours, copies des ordonnances'], ['glasses', 'Lunettes de rechange', 'si besoin', 0, 'lunettes', 'ou lentilles'],
+              ['tp', 'Papier toilette', X(Math.max(2, Math.ceil(2 * nd / 5))), 0, 'papier'], ['wcbags', 'Sacs toilettes de secours', X(nd), 0, 'sacs pour', "si l'eau est coupée"], ['brushes', 'Brosses à dents', X(n), n, 'brosses', 'dentifrice, savon, lingettes, protections hygiéniques']] },
+    { title: 'Lumière et radio', voId: 'h3',
+      items: [['radio', 'Radio à piles ou manivelle', 'x1', 0, 'radio', 'pour écouter les consignes'], ['torches', 'Lampes torches', X(a), a, 'lampes'], e ? ['headlamps', 'Frontales enfants', X(e), e] : null,
+              ['batteries', 'Piles de rechange', X((2 * n + 2) * Math.ceil(d / 7)), 0, 'piles de', '2 par personne et 2 pour la radio, par semaine'], ['powerbank', 'Batterie externe', X(Math.max(1, Math.ceil(n / 4))), 0, 'batterie', 'chargée, avec câbles']].filter(Boolean) },
+    { title: 'Chaleur et confinement', voId: long ? 'h4L' : 'h4',
+      items: [['blankets', 'Couvertures de survie', X(n), n, 'couvertures'], long ? ['sleepingbag', 'Sacs de couchage', X(n), n, 'sacs de', 'ou couvertures chaudes'] : null,
+              long ? ['stove', 'Réchaud et cartouches', 'x1', 0, 'réchaud', '+ briquet ou allumettes ; jamais dans une pièce fermée (monoxyde de carbone)'] : null,
+              ['games', 'Jeux et crayons', '1 kit', 0, 'jeux'], ['tape', 'Ruban adhésif', 'pour calfeutrer', 0, 'ruban'], ['knife', 'Couteau multifonction', 'x1', 0, 'couteau']].filter(Boolean) }
+  ];
+  if (withPapers) rows.push({ title: 'Papiers et argent', voId: 'h5',
+    items: [['pouch', 'Pochette étanche', 'x1', 0, 'pochette'], ['papers', 'Copies des papiers', 'identité, ordonnances', 0, 'copies', 'assurance, carnet de santé'], ['cash', 'Argent liquide', 'petites coupures', 0, 'argent'], ['keys', 'Doubles des clés', '1 jeu', 0, 'doubles']] });
+  return rows;
+}
+function evacRows(a, e) {
+  const rows = [
+    { title: a > 1 ? 'Chaque sac adulte' : 'Votre sac', note: a > 1 ? `À préparer en ${a} exemplaires` : null, dest: 'adult', per: a, voId: a > 1 ? 'e1N' : 'e1One',
+      items: [['bottle', "Bouteille d'eau", '1,5 L', 0, 'eau'], ['bars', 'Repas et barres', '72 h', 0, 'repas', 'sans cuisson, légers'], ['headlamps', 'Lampe frontale', 'x1', 1, 'lampe', 'et ses piles'],
+              ['outfit', 'Vêtements chauds et pluie', '+ 1 change', 0, 'vêtements', 'polaire, bonnet, imperméable, chaussettes, sous-vêtements ; chaussures solides aux pieds'], ['sleepingbag', 'Sac de couchage', 'ou couverture', 1, 'sac de'],
+              ['blankets', 'Couverture de survie', 'x1', 1, 'couverture'], ['toiletkit', 'Trousse de toilette', '+ masques', 0, 'trousse', 'brosse à dents, lingettes, gel, papier, protections hygiéniques, masques FFP2'], ['whistle', 'Sifflet', 'x1', 0, 'sifflet']] },
+    { title: a > 1 ? 'À répartir entre adultes' : 'Aussi dans votre sac', note: 'Un seul exemplaire pour le foyer', dest: 'adult', per: 1, voId: a > 1 ? 'e2N' : 'e2One',
+      items: [['pouch', 'Papiers et clés', 'pochette étanche', 0, 'papiers', "copies d'identité, ordonnances, assurance ; doubles des clés"], ['cash', 'Argent liquide', 'petites coupures', 0, 'argent'], ['map', 'Contacts et carte', '+ stylo', 0, 'contacts', 'numéros utiles sur papier, point de rendez-vous'],
+              ['radio', 'Radio à manivelle', 'x1', 0, 'radio'], ['firstaid', 'Trousse et médicaments', '7 jours', 0, 'trousse', 'traitements en cours, ordonnances'], ['powerbank', 'Batterie et câble', 'chargée', 0, 'batterie'], ['knife', 'Couteau multifonction', 'x1', 0, 'couteau']] }
+  ];
+  if (e) rows.push({ title: e > 1 ? 'Chaque sac enfant' : 'Le sac enfant', note: 'Léger : 10 à 15 % de son poids', dest: 'kid', per: e, voId: e > 1 ? 'e3N' : 'e3One',
+    items: [['flask', 'Gourde', '0,5 L', 0, 'gourde'], ['snacks', 'Goûters et barres', '72 h', 0, 'goûter'], ['teddy', 'Doudou', 'x1', 1, 'doudou'], ['headlamps', 'Petite frontale', 'x1', 1, 'lampe'],
+            ['blankets', 'Couverture de survie', 'x1', 1, 'couverture'], ['kidclothes', 'Change chaud et pluie', 'x1', 0, 'change', 'pull, k-way, chaussettes ; chaussures fermées aux pieds'], ['tags', 'Étiquette avec vos numéros', 'x1', 1, 'étiquette']] });
+  return rows;
+}
+
+function build(c) {
+  clearDyn();
+  const a = c.a, e = c.e, n = a + e, home = c.mode !== 'evac', evac = c.mode !== 'home', both = home && evac;
+  const d = home ? c.d : 3;
+  crateTex.relabel([['RÉSERVE', 96, 96], [durShort(d).toUpperCase(), 80, 196]]);
+  K = { a, e, n, d, home, evac, both, crateIn: Infinity, lidClose: Infinity, tplIn: Infinity, flapClose: Infinity, L0: Infinity };
+  SEGS = []; LINES = []; CK = [];
+  let T = 0;
+  const LEAD = 0.25;
+  const vd = (sp, min) => Math.max(min, LEAD + sp.sd + 0.55);
+  const push = s => { s.start = T; T += s.dur; s.end = T; SEGS.push(s);
+    if (s.vo) LINES.push({ t: s.start + LEAD, id: s.vo.id, text: s.vo.text, sd: s.vo.sd, chunks: chunkText(s.vo.text, s.vo.sd, s.vo.map) }); return s; };
+  /* calage des objets sur les mots prononcés */
+  const rowTiming = (sp, items) => {
+    const low = sp.text.toLowerCase(); let from = 0;
+    const rel = items.map(it => { const cue = it[4]; if (!cue) return null; const p = low.indexOf(cue.toLowerCase(), from); if (p < 0) return null; from = p + cue.length; return LEAD + sp.map(p) - 0.3; });
+    for (let i = 0; i < rel.length; i++) if (rel[i] == null) {
+      let j = i + 1; while (j < rel.length && rel[j] == null) j++;
+      const prev = i ? rel[i - 1] : LEAD, next = j < rel.length ? rel[j] : null;
+      rel[i] = next == null ? prev + 0.5 : prev + (next - prev) / (j - i + 1);
+    }
+    for (let i = 0; i < rel.length; i++) rel[i] = Math.max(rel[i], i ? rel[i - 1] + 0.32 : 0.35);
+    return { rel, dur: Math.max(rel[rel.length - 1] + 1.4, vd(sp, 0)) };
+  };
+
+  /* intro */
+  const iv = say((n === 1 ? 'intro1' : 'introN') + (d === 3 ? '' : '_' + d));
+  push({ type: 'intro', vo: iv, dur: vd(iv, 3.4), cams: [[0, [0, 0.6, -1.3], 0.95, 0.26], [-0.3, [0, 0.6, -1.3], 1.02, 0.26]] });
+
+  const addRow = (r, i, act, actName, of) => {
+    const vo = say(r.voId), tm = rowTiming(vo, r.items);
+    const sg = push(Object.assign({ type: 'row', act, actName, k: i + 1, of, dur: tm.dur,
+      cams: [[0.45, [0, 0.4, ROWZ[i]], 2.4, 0.12], [-0.3, [0, 0.4, ROWZ[i]], 2.46, 0.12]] }, r, { vo }));
+    addItems(sg, i, tm.rel);
+    if (r.dest) sg.refs.forEach(it => it.dest = r.dest);
+  };
+
+  /* rester chez soi */
+  if (home) {
+    const vo = say(both ? 'actHome2' : 'actHome1');
+    const sAct = push({ type: 'act', act: 'home', tag: both ? 'Cas 1 sur 2' : 'Scénario', title: 'Rester chez soi',
+      desc: "Coupure, tempête ou confinement : une réserve à la maison, l'eau stockée à part.", vo, dur: vd(vo, 2.6),
+      cams: [[0.4, [-1.6, 0.7, -4.6], 1.35, 0.2], [-0.2, [-1.6, 0.7, -4.6], 1.4, 0.2]] });
+    K.crateIn = sAct.start + 0.5;
+    const rows = homeRows(a, e, d, !evac);
+    rows.forEach((r, i) => addRow(r, i, 'home', 'Rester chez soi', rows.length));
+    const homeItems = ITEMS.filter(it => it.act === 'home');
+    const pvo = say('packHome');
+    const need = 0.5 + (homeItems.length - 1) * 0.1 + FLYDUR + 1.6;
+    const sPack = push({ type: 'packHome', vo: pvo, dur: Math.max(need, vd(pvo, 3.6)),
+      cams: [[0.45, [-1.8, 0.7, -5.2], 1.45, 0.2], [-0.2, [-1.8, 0.7, -5.2], 1.5, 0.2]] });
+    homeItems.forEach((it, i) => { it.fly = sPack.start + 0.5 + i * 0.1; it.dest = it.key === 'water' ? 'pallet' : 'crate'; });
+    K.lidClose = sPack.start + 0.5 + (homeItems.length - 1) * 0.1 + FLYDUR + 0.15;
+  }
+
+  /* évacuer */
+  if (evac) {
+    const vo = say(both ? 'actEvac2' : 'actEvac1');
+    const sAct = push({ type: 'act', act: 'evac', tag: both ? 'Cas 2 sur 2' : 'Scénario', title: 'Évacuer',
+      desc: "Sur ordre des autorités : chacun son sac, prêt près de la porte. On n'emporte que ce qu'on peut porter.", vo, dur: vd(vo, 2.6),
+      cams: [[0.4, [3.4, 0.8, -5.8], 1.6, 0.2], [-0.2, [3.4, 0.8, -5.8], 1.66, 0.2]] });
+    K.tplIn = sAct.start + 0.4;
+    const rows = evacRows(a, e);
+    rows.forEach((r, i) => addRow(r, i, 'evac', 'Évacuer', rows.length));
+    const evacItems = ITEMS.filter(it => it.act === 'evac');
+    const flyPhase = 0.5 + (evacItems.length - 1) * 0.085 + FLYDUR;
+    const lineupPhase = 0.75 + (n - 1) * 0.13 + 0.8;
+    const pvo = say(n === 1 ? 'packEvac1' : 'packEvacN');
+    const L0off = flyPhase + 0.7;
+    const sPack = push({ type: 'packEvac', vo: pvo, dur: Math.max(L0off + lineupPhase + 0.6, vd(pvo, 3.6)),
+      cams: [[0.45, [3.2, 0.8, -5.6], 1.5, 0.2], [L0off - 0.1, [3.2, 0.8, -5.6], 1.55, 0.2], [L0off + 0.9, [0, 0.7, -1.2], 1.85, 0.2], [-0.2, [0, 0.7, -1.2], 1.9, 0.2]] });
+    evacItems.forEach((it, i) => { it.fly = sPack.start + 0.5 + i * 0.085; });
+    K.flapClose = sPack.start + flyPhase + 0.05;
+    K.L0 = sPack.start + L0off;
+  }
+
+  /* fin */
+  const fvo = say('final');
+  const sFinal = push({ type: 'final', vo: fvo, dur: Math.max(4.6, vd(fvo, 0)),
+    cams: [[0.5, [-0.8, 0.7, -3.2], 1.35, 0.22], [-0.01, [-0.8, 0.7, -3.2], 1.4, 0.22]] });
+  K.hop = sFinal.start + 0.4;
+  DUR = T;
+  K.previewT = DUR - 0.6;
+
+  /* caméra */
+  SEGS.forEach(s => s.cams.forEach(([dt, tgt, z, k]) => CK.push([s.start + (dt < 0 ? s.dur + dt : dt), tgt, z, k])));
+  CK.sort((p, q) => p[0] - q[0]);
+
+  /* sacs alignés, un par personne */
+  if (evac) {
+    const slots = [];
+    for (let i = 0; i < a; i++) slots.push({ adult: true, i, x: (i - (a - 1) / 2) * 1.75, z: -2.2 });
+    for (let j = 0; j < e; j++) slots.push({ adult: false, i: j, x: (j - (e - 1) / 2) * 1.35, z: 0.4 });
+    slots.forEach((sl, idx) => {
+      const bag = makeBag(sl.adult ? cyc(['#e8592a', '#3f8fd0', '#4f9d69'], sl.i) : cyc(['#f2b33d', '#7cc7a1', '#ec8fae'], sl.i), sl.adult);
+      world.add(bag.g); bag.g.visible = false;
+      const from = sl.adult ? tplAdult.g.position : tplKid.g.position;
+      LINEUP.push({ ...bag, t0: K.L0 + idx * 0.13, from: [from.x, 0, from.z], to: [sl.x, 0, sl.z],
+        s0: sl.adult ? TPL_S.adult : TPL_S.kid, s1: sl.adult ? 0.46 : 0.33, ry: 0.15, ph: idx * 0.9 });
+    });
+  }
+}
+
+/* ---------- caméra ---------- */
+const FR = { halfH: 22 };
+function camAt(t) {
+  if (!CK.length) return { x: 0, y: 0.6, z: 0, zoom: 1, k: 0.25 };
+  let i = 0; while (i < CK.length - 1 && t > CK[i + 1][0]) i++;
+  const a = CK[i], b = CK[Math.min(i + 1, CK.length - 1)];
+  const span = b[0] - a[0], u = t <= a[0] ? 0 : span > 0 ? eIO(clamp((t - a[0]) / span)) : 1;
+  return { x: lerp(a[1][0], b[1][0], u), y: lerp(a[1][1], b[1][1], u), z: lerp(a[1][2], b[1][2], u), zoom: lerp(a[2], b[2], u), k: lerp(a[3], b[3], u) };
+}
+const tmpOff = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
+function placeCamera(t) {
+  const c = configuring ? { x: 0, y: 0.7, z: -1.6, zoom: 1.8, k: 0.47 } : camAt(t);
+  const sway = reduceMotion ? 0 : 0.035 * Math.sin(t * 0.45);
+  tmpOff.copy(OFF).applyAxisAngle(UP, sway);
+  camera.position.set(c.x + tmpOff.x, c.y + tmpOff.y, c.z + tmpOff.z);
+  camera.lookAt(c.x, c.y, c.z);
+  camera.zoom = c.zoom;
+  camera.top = FR.halfH * (1 - c.k); camera.bottom = -FR.halfH * (1 + c.k);
+  camera.updateProjectionMatrix();
+}
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false);
+  const asp = w / h, halfH = Math.max(11, 12.4 / asp);
+  FR.halfH = halfH; camera.left = -halfH * asp; camera.right = halfH * asp;
+}
+resize();
+if (window.ResizeObserver) new ResizeObserver(resize).observe(stage); else window.addEventListener('resize', resize);
+
+/* ---------- animation 3D ---------- */
+function gulp(t, dest) { let g = 0; for (const it of ITEMS) { if (it.dest !== dest) continue; const d = t - (it.fly + FLYDUR); if (d > 0 && d < 0.22) g += Math.sin(Math.PI * d / 0.22); } return Math.min(g, 1.4); }
+function squash(inner, amount) { const s = 1 + 0.05 * amount; inner.scale.set(s, 2 - s, s); }
+
+function update(t) {
+  platform.position.y = lerp(-5, 0, eOut(clamp(t / 1.1)));
+  [backStrip, ...strips].forEach((s, i) => { s.scale.x = Math.max(0.001, eBack(clamp((t - 0.6 - i * 0.1) / 0.5))); });
+
+  /* bac + palette */
+  const cOn = K.home && t >= K.crateIn;
+  crate.visible = pallet.visible = cOn;
+  if (cOn) {
+    const u = clamp((t - K.crateIn) / 0.8);
+    crate.position.y = 6 * (1 - eBounce(u)); pallet.position.y = crate.position.y;
+    let l = -1.9 * eBack(clamp((t - K.crateIn - 0.6) / 0.6));
+    if (t >= K.lidClose) l = -1.9 * (1 - eBounce(clamp((t - K.lidClose) / 0.6)));
+    lid.rotation.x = l; squash(crateInner, gulp(t, 'crate'));
+  }
+
+  /* sacs modèles */
+  [[tplAdult, 'adult', K.evac], [tplKid, 'kid', K.evac && K.e > 0]].forEach(([b, key, on]) => {
+    const vis = on && t >= K.tplIn && t < K.L0 + 0.4;
+    b.g.visible = vis; if (!vis) return;
+    let s = TPL_S[key] * Math.max(0.001, eBack(clamp((t - K.tplIn - (key === 'kid' ? 0.15 : 0)) / 0.5)));
+    if (t > K.L0) s *= 1 - eIn(clamp((t - K.L0) / 0.4));
+    b.g.scale.setScalar(Math.max(s, 0.001));
+    b.g.position.y = 4 * (1 - eBounce(clamp((t - K.tplIn) / 0.8)));
+    let fl = t >= K.tplIn + 0.5 ? -2.2 * eBack(clamp((t - K.tplIn - 0.5) / 0.7)) : 0;
+    if (t >= K.flapClose) fl = -2.2 * (1 - eBounce(clamp((t - K.flapClose) / 0.6)));
+    b.flap.rotation.x = fl; squash(b.inner, gulp(t, key));
+  });
+
+  /* objets */
+  ITEMS.forEach(it => {
+    const g = it.g;
+    if (t < it.tDrop) { g.visible = false; it.ring.visible = false; return; }
+    let x = it.x, y = 0.02, z = it.z, sx = 1, sy = 1, ry = 0, vis = true;
+    const u = (t - it.tDrop) / 0.4;
+    if (u < 1) { y += 5 * (1 - u * u); sy = 1.1; sx = 0.94; ry = 0.9 * (1 - u); }
+    else { const v = clamp((t - it.tDrop - 0.4) / 0.5), w = Math.sin(v * Math.PI * 2) * Math.pow(1 - v, 1.6); sy = 1 - 0.22 * w; sx = 1 + 0.11 * w; }
+    if (t >= it.fly) {
+      const f = clamp((t - it.fly) / FLYDUR), e = eIO(f), D = DEST[it.dest];
+      x = lerp(it.x, D[0], e); z = lerp(it.z, D[2], e); y = lerp(0.02, D[1], e) + 3.0 * Math.sin(Math.PI * f);
+      if (it.dest === 'pallet') { sx = sy = lerp(1, 1.25 / Math.max(it.s, 0.3) * Math.min(it.s, 1), e); ry = 0; }
+      else { sx = sy = 1 - 0.88 * eIn(f); ry = f * 2.4; if (f >= 1) vis = false; }
+    }
+    g.visible = vis;
+    g.position.set(x, y, z); g.scale.set(it.s * sx, it.s * sy, it.s * sx); g.rotation.y = ry;
+    const rv = (t - it.tDrop - 0.4) / 0.55;
+    if (rv > 0 && rv < 1 && t < it.fly) { it.ring.visible = true; const sc = 0.6 + 1.1 * rv; it.ring.scale.set(sc, sc, sc); it.ring.material.opacity = 0.7 * (1 - rv); }
+    else it.ring.visible = false;
+  });
+
+  /* sacs de chacun */
+  LINEUP.forEach(b => {
+    if (t < b.t0) { b.g.visible = false; return; }
+    const f = clamp((t - b.t0) / 0.75), e = eIO(f);
+    b.g.visible = true;
+    b.g.position.set(lerp(b.from[0], b.to[0], e), 3.2 * Math.sin(Math.PI * f), lerp(b.from[2], b.to[2], e));
+    b.g.scale.setScalar(lerp(b.s0, b.s1, e)); b.g.rotation.y = (1 - e) * 1.6 + b.ry;
+    const v = clamp((t - b.t0 - 0.75) / 0.45), w = Math.sin(v * Math.PI * 2) * Math.pow(1 - v, 1.6);
+    b.inner.scale.set(1 + 0.1 * w, 1 - 0.18 * w, 1 + 0.1 * w);
+    if (!reduceMotion && t > K.hop && t < K.hop + 2.4) b.g.position.y += 0.35 * Math.abs(Math.sin((t - K.hop) * 5.2 + b.ph)) * clamp((K.hop + 2.4 - t) / 0.6);
+  });
+
+  placeCamera(t);
+}
+
+/* ---------- interface ---------- */
+const $ = id => document.getElementById(id);
+const card = $('card'), sub = $('sub'), intro = $('intro'), outro = $('outro'), bar = $('bar'), pill = $('pill');
+let curSeg = null, liEls = [], configuring = true;
+const v3 = new THREE.Vector3();
+
+function famLabel() {
+  const { a, e } = K;
+  return `${a} ${pl(a, 'adulte', 'adultes')}` + (e ? `, ${e} ${pl(e, 'enfant', 'enfants')}` : '');
+}
+function segAt(t) { for (const s of SEGS) if (t < s.end) return s; return SEGS[SEGS.length - 1]; }
+function reveal(el, on) { if (on && el.hidden) { el.hidden = false; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); } else if (!on) el.hidden = true; }
+
+function renderCard(s) {
+  liEls = []; card.className = 'card';
+  const { a, e, n, d } = K, nd = n * d;
+  if (s.type === 'act') {
+    card.classList.add('act');
+    card.innerHTML = `<p class="tagline"><span>${s.tag}</span></p><h2>${s.title}</h2><p class="desc">${s.desc}</p>`;
+  } else if (s.type === 'row') {
+    card.innerHTML = `<p class="tagline"><span>${s.actName}</span><span>${s.k} / ${s.of}</span></p><h2>${s.title}</h2>${s.note ? `<p class="note">${s.note}</p>` : ''}<ol>${s.refs.map((it, i) =>
+      `<li><span class="n">${i + 1}</span><span>${it.name}</span><span class="q">${it.qty}</span></li>`).join('')}</ol>`;
+    liEls = [...card.querySelectorAll('li')].map((li, i) => ({ li, it: s.refs[i] }));
+  } else if (s.type === 'packHome') {
+    const rows = [["Eau stockée", `${2 * nd} à ${3 * nd} L`], ["Soit", `${Math.ceil(2 * nd / 5)} à ${Math.ceil(3 * nd / 5)} bidons de 5 L`], ["Repas sans cuisson", `${3 * nd}`], ["Rangement", "un bac près de l'entrée"]];
+    card.innerHTML = `<p class="tagline"><span>Rester chez soi</span><span>${durShort(d)}</span></p><h2>La réserve est prête</h2><ol>${rows.map(([k, v]) => `<li class="on"><span class="n">✓</span><span>${k}</span><span class="q">${v}</span></li>`).join('')}</ol>`;
+  } else if (s.type === 'packEvac') {
+    const rows = [[pl(a, 'Sac adulte', 'Sacs adultes'), 'x' + a]];
+    if (e) rows.push([pl(e, 'Sac enfant', 'Sacs enfants'), 'x' + e], ['Poids d’un sac enfant', '10 à 15 % du sien']);
+    rows.push(["Eau dans les sacs", fr(1.5 * a + 0.5 * e) + ' L'], ['Rangement', 'près de la porte']);
+    card.innerHTML = `<p class="tagline"><span>Évacuer</span></p><h2>${n === 1 ? 'Votre sac est prêt' : `${n} sacs prêts`}</h2><ol>${rows.map(([k, v]) => `<li class="on"><span class="n">✓</span><span>${k}</span><span class="q">${v}</span></li>`).join('')}</ol>`;
+  } else { card.hidden = true; return; }
+  card.hidden = true; reveal(card, true);
+}
+
+function updateHTML(t) {
+  bar.style.width = (100 * clamp(t / DUR)) + '%';
+  const s = segAt(t);
+  if (s !== curSeg) {
+    curSeg = s; renderCard(s);
+    pill.textContent = s.act === 'home' || s.type === 'packHome' ? 'Chez soi' : s.act === 'evac' || s.type === 'packEvac' ? 'Évacuer' : durShort(K.d);
+  }
+  reveal(intro, s.type === 'intro' && t >= 0.3 && t < s.end - 0.15);
+  reveal(outro, s.type === 'final');
+  $('outroActions').hidden = !(t >= DUR);
+  if ($('bSkip').hidden !== t >= DUR) $('bSkip').hidden = t >= DUR;
+  liEls.forEach(({ li, it }) => li.classList.toggle('on', t >= it.tDrop + 0.45));
+
+  renderSub(t);
+
+  const W = stage.clientWidth, H = stage.clientHeight;
+  ITEMS.forEach(it => {
+    const since = t - it.tDrop - 0.45, on = since > 0 && t < it.seg.end - 0.3 && t < it.fly;
+    if (!on) { if (it.badge.style.opacity !== '0') it.badge.style.opacity = '0'; return; }
+    v3.set(it.x, it.h + 0.45, it.z).project(camera);
+    const sx = (v3.x + 1) / 2 * W, sy = (1 - v3.y) / 2 * H;
+    const sc = eBack(clamp(since / 0.35)), fade = clamp((it.seg.end - 0.3 - t) / 0.25);
+    it.badge.style.opacity = String(Math.min(clamp(since / 0.15), fade));
+    it.badge.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) scale(${(0.4 + 0.6 * sc).toFixed(3)})`;
+  });
+}
+
+/* ---------- sous-titres ---------- */
+let subKey = '', wordEls = [];
+function lineAt(t) { let li = -1; for (let i = 0; i < LINES.length; i++) if (t >= LINES[i].t) li = i; return li; }
+function renderSub(t) {
+  const li = lineAt(t), l = LINES[li], next = LINES[li + 1];
+  const on = !configuring && l && t < l.t + l.sd + 0.7 && (!next || t < next.t - 0.05);
+  if (!on) { sub.hidden = true; subKey = ''; return; }
+  const lt = t - l.t;
+  let ci = 0; while (ci < l.chunks.length - 1 && lt >= l.chunks[ci + 1].s0) ci++;
+  const ch = l.chunks[ci], key = li + ':' + ci;
+  if (key !== subKey) {
+    subKey = key;
+    sub.innerHTML = ch.words.map(w => `<span class="w">${w.x}</span>`).join(' ');
+    wordEls = [...sub.querySelectorAll('.w')];
+    sub.classList.remove('swap'); void sub.offsetWidth; sub.classList.add('swap');
+  }
+  ch.words.forEach((w, i) => wordEls[i].classList.toggle('said', lt >= w.ws - 0.05));
+  sub.hidden = false;
+}
+
+/* ---------- voix off ---------- */
+let voiceOn = false, active = null;
+const AUD = {};
+function audioFor(id) { if (!VOICE[id]) return null; if (!AUD[id]) { AUD[id] = new Audio(VOICE[id].src); AUD[id].preload = 'auto'; } return AUD[id]; }
+function stopAudio() { if (active) { active.a.pause(); active = null; } }
+function voiceTick(t) {
+  if (!hasVoice) return;
+  const l = LINES[lineAt(t)];
+  const inLine = l && t < l.t + l.sd;
+  if (voiceOn && playing && inLine && (!active || active.l !== l)) {
+    stopAudio(); const au = audioFor(l.id);
+    if (au) { au.playbackRate = speed; try { au.currentTime = Math.max(0, t - l.t); } catch (_) {} const pr = au.play(); if (pr && pr.catch) pr.catch(() => {}); active = { l, a: au }; }
+  }
+  if (active && (!inLine || active.l !== l)) { if (active.a.ended || t > active.l.t + active.l.sd + 0.2) stopAudio(); }
+}
+/* horloge : pendant qu'un clip joue, l'animation suit l'audio */
+function audioClock() {
+  if (!active || active.a.paused || active.a.ended) return null;
+  const at = active.l.t + active.a.currentTime;
+  return Math.abs(at - t) < 0.6 ? at : null;
+}
+
+/* ---------- configurateur ---------- */
+function loadCfg() {
+  const c = { a: 2, e: 3, d: D_MIN, mode: 'both', voice: true, speed: 1 };
+  try { const s = JSON.parse(localStorage.getItem('kit72.cfg') || 'null'); if (s && typeof s === 'object') Object.assign(c, s); } catch (_) {}
+  try { const q = new URLSearchParams(location.search);
+    if (q.has('adultes')) c.a = +q.get('adultes'); if (q.has('enfants')) c.e = +q.get('enfants'); if (q.has('jours')) c.d = +q.get('jours');
+    if (q.has('scenario')) c.mode = { 'les-deux': 'both', 'chez-soi': 'home', 'evacuation': 'evac' }[q.get('scenario')] || c.mode; } catch (_) {}
+  c.a = qn(Number.isFinite(c.a) ? c.a : 2, 1, 6); c.e = qn(Number.isFinite(c.e) ? c.e : 3, 0, 6); c.d = qn(Number.isFinite(c.d) ? c.d : D_MIN, D_MIN, D_MAX);
+  if (!['both', 'home', 'evac'].includes(c.mode)) c.mode = 'both';
+  c.voice = c.voice !== false;
+  if (![1, 1.5, 2].includes(c.speed)) c.speed = 1;
+  return c;
+}
+const cfg = loadCfg();
+function saveCfg() { try { localStorage.setItem('kit72.cfg', JSON.stringify(cfg)); } catch (_) {} }
+const form = $('cfg');
+
+function syncForm() {
+  $('outA').innerHTML = `${cfg.a}<span class="sr-only"> ${pl(cfg.a, 'adulte', 'adultes')}</span>`;
+  $('outE').innerHTML = `${cfg.e}<span class="sr-only"> ${pl(cfg.e, 'enfant', 'enfants')}</span>`;
+  form.querySelectorAll('.st-btn').forEach(b => {
+    const k = b.dataset.k, d = +b.dataset.d, v = cfg[k], lo = k === 'a' ? 1 : 0;
+    b.disabled = d < 0 ? v <= lo : v >= 6;
+  });
+  form.querySelectorAll('input[name=mode]').forEach(r => { r.checked = r.value === cfg.mode; });
+  $('voice').checked = cfg.voice && hasVoice; $('voiceRow').hidden = !hasVoice;
+  const dur = $('dur');
+  dur.value = cfg.d; dur.setAttribute('aria-valuetext', durTxt(cfg.d));
+  $('outD').textContent = durTxt(cfg.d);
+  $('durRow').style.setProperty('--f', (cfg.d - D_MIN) / (D_MAX - D_MIN));
+  $('durRow').hidden = cfg.mode === 'evac';
+  const n = cfg.a + cfg.e, nd = n * K.d, cells = [];
+  if (cfg.mode !== 'evac') cells.push(['Eau à stocker', `${2 * nd} à ${3 * nd} L`]);
+  if (cfg.mode !== 'home') cells.push(['Sacs à préparer', `${n}`]);
+  if (cfg.mode === 'home') cells.push(['Repas', `${3 * nd}`]);
+  if (cfg.mode === 'evac') cells.push(['Eau à porter', fr(1.5 * cfg.a + 0.5 * cfg.e) + ' L']);
+  cells.push(['Animation', `${Math.round(DUR)} s`]);
+  $('preview').innerHTML = cells.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  const kit = durTxt(K.d).replace(' ', ' ');
+  $('cfgTitle').textContent = `Kit d'urgence ${kit}`; $('introDur').textContent = kit;
+  $('hudKit').textContent = document.title = `Kit d'urgence ${durShort(K.d)}`;
+  $('hudFam').textContent = famLabel();
+  $('bPdfLabel').textContent = cfg.mode === 'both' ? 'Télécharger mes listes (PDF)' : 'Télécharger ma liste (PDF)';
+  $('introFam').textContent = `Pour ${famLabel().replace(', ', ' et ')}`;
+}
+function applyCfg() { build(cfg); curSeg = null; subKey = ''; t = K.previewT; syncForm(); saveCfg(); }
+
+form.addEventListener('click', ev => {
+  const b = ev.target.closest('.st-btn'); if (!b || b.disabled) return;
+  const k = b.dataset.k; cfg[k] = qn(cfg[k] + +b.dataset.d, k === 'a' ? 1 : 0, 6); applyCfg();
+  if (b.disabled) (b.parentElement.querySelector('.st-btn:not(:disabled)') || b).focus();
+});
+$('dur').addEventListener('input', ev => { const v = qn(+ev.target.value, D_MIN, D_MAX); if (v !== cfg.d) { cfg.d = v; applyCfg(); } });
+form.addEventListener('change', ev => {
+  if (ev.target.name === 'mode') { cfg.mode = ev.target.value; applyCfg(); }
+  if (ev.target.id === 'voice') { cfg.voice = ev.target.checked; saveCfg(); }
+});
+$('bLaunch').addEventListener('click', launch);
+
+/* ---------- listes à cocher (PDF, jsPDF chargé au clic) ---------- */
+let jspdfP = null;
+function loadJsPDF() {
+  if (window.jspdf) return Promise.resolve(window.jspdf.jsPDF);
+  if (!jspdfP) jspdfP = new Promise((ok, ko) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js';
+    s.integrity = 'sha512-plOdviVmws4Y3JAvbnpfKb2hVxKM1lCwsi3vmElYRj+tiDLffZ4FVUj5a8vyKJ9pIgl8JCAHEJ4D1iUKBecswg==';
+    s.crossOrigin = 'anonymous';
+    s.onload = () => window.jspdf ? ok(window.jspdf.jsPDF) : ko();
+    s.onerror = () => { jspdfP = null; s.remove(); ko(); };
+    document.head.appendChild(s);
+  });
+  return jspdfP;
+}
+/* polices standard du PDF : Latin-1 seulement */
+const pdfTxt = s => String(s).replace(/[’‘]/g, "'").replace(/[–—]/g, '-').replace(/…/g, '...').replace(/œ/g, 'oe').replace(/[  ]/g, ' ');
+const PDF_EXTRA = [['Gants de travail'], ["Pastilles de purification de l'eau", null, 'en dernier recours, si l\'eau manque'],
+  ['Lunettes ou lentilles de rechange'], ['Bébé', null, 'couches, lait prêt à boire, biberon'], ['Animaux', null, 'nourriture, laisse ou caisse, carnet de santé']];
+const PDF_HOME_EXTRA = [['Vêtements chauds', null, 'si le chauffage est coupé'], ['Gel hydroalcoolique et savon'], ['Extincteur ou couverture anti-feu', null, 'surtout avec un réchaud ou des bougies'],
+  ["Comprimés d'iode", "près d'une centrale",'à prendre uniquement sur consigne des autorités'], ['Bébé', null, 'lait prêt à boire, couches, biberons'], ['Animaux', null, 'nourriture et eau pour toute la durée']];
+
+function makePdf(JsPDF) {
+  const { a, e, n, d, home, evac, both } = K, nd = n * d;
+  const doc = new JsPDF({ unit: 'mm', format: 'a4' });
+  const W = 210, H = 297, M = 16, R = W - M;
+  const C = { ink: '#1d2540', muted: '#5a6280', acc: '#d24a1c', accT: '#b23c12', navy: '#26324f', cream: '#fbf6ec', line: '#e6dccb', chip: '#f3ebdc' };
+  const fam = famLabel().replace(', ', ' et ');
+  const txt = (s, x, y, o) => doc.text(pdfTxt(s), x, y, o);
+  const font = (size, bold, color) => { doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(size); doc.setTextColor(color || C.ink); };
+  const box = (x, y) => { doc.setDrawColor(C.ink); doc.setLineWidth(0.35); doc.roundedRect(x, y - 3.7, 4.4, 4.4, 0.9, 0.9, 'S'); };
+  let y = 0;
+  const need = h => { if (y + h > H - 18) { doc.addPage(); y = 20; } };
+
+  const header = (title, sub, pill) => {
+    doc.setFillColor(C.navy); doc.rect(0, 0, W, 30, 'F');
+    doc.setFillColor(C.acc); doc.rect(0, 30, W, 1.6, 'F');
+    font(22, true, C.cream); txt(title, M, 15);
+    font(10.5, false, '#d5d9e6'); txt(sub, M, 23.5);
+    font(11, true, '#ffffff'); const pw = doc.getTextWidth(pdfTxt(pill)) + 10;
+    doc.setFillColor(C.acc); doc.roundedRect(R - pw, 8.5, pw, 9, 4.5, 4.5, 'F'); txt(pill, R - pw / 2, 14.4, { align: 'center' });
+    y = 40;
+  };
+  const stats = cells => {
+    const gap = 4, w = (R - M - gap * (cells.length - 1)) / cells.length;
+    cells.forEach(([k, v], i) => { const x = M + i * (w + gap);
+      doc.setDrawColor(C.line); doc.setLineWidth(0.5); doc.setFillColor('#fffdf8'); doc.roundedRect(x, y, w, 16, 3, 3, 'FD');
+      font(8, true, C.muted); txt(k, x + w / 2, y + 5.8, { align: 'center' });
+      font(12.5, true); txt(v, x + w / 2, y + 12.4, { align: 'center' }); });
+    y += 22;
+  };
+  /* bandeau teinté ; une section reste sur une seule page si elle y tient */
+  const band = (title, note, tint, total, cols, cx0, cw) => {
+    if (y + total > H - 18 && total < H - 40) { doc.addPage(); y = 20; }
+    doc.setFillColor(tint); doc.roundedRect(M, y, R - M, 9, 2.5, 2.5, 'F');
+    font(11.5, true); txt(title, M + 4, y + 6.2);
+    if (note) { font(8.5, false, C.muted); txt(note, cols ? cx0 - 3 : R - 4, y + 6, { align: 'right' }); }
+    if (cols) { font(7.5, true, C.muted); for (let k = 0; k < cols; k++) txt(String(k + 1), cx0 + k * cw + cw / 2, y + 6, { align: 'center' }); }
+    y += 13.5;
+  };
+  /* une ligne par objet ; per > 1 = une case par sac */
+  const section = (title, note, tint, per, items) => {
+    const cols = per > 1 ? per : 0, cw = 8.5, cx0 = R - cols * cw, textX = cols ? M + 3 : M + 9, qtyR = cols ? cx0 - 3 : R;
+    font(8.5);
+    const rows = items.map(([name, qty, detail]) => { const lines = detail ? doc.splitTextToSize(pdfTxt(detail), qtyR - textX - 32) : [];
+      return { name, qty, lines, h: 6.6 + lines.length * 3.5 }; });
+    band(title, note, tint, 13.5 + rows.reduce((s, r) => s + r.h, 0), cols, cx0, cw);
+    rows.forEach(({ name, qty, lines, h }) => {
+      need(h);
+      if (cols) for (let k = 0; k < cols; k++) box(cx0 + k * cw + (cw - 4.4) / 2, y); else box(M + 1.5, y);
+      font(10.5, true); txt(name, textX, y);
+      if (qty) { font(9.5, true, C.accT); txt(qty, qtyR, y, { align: 'right' }); }
+      if (lines.length) { font(8.5, false, C.muted); doc.text(lines, textX, y + 4.1); }
+      y += h;
+      doc.setDrawColor(C.line); doc.setLineWidth(0.2); doc.line(M, y - 4.2, R, y - 4.2);
+    });
+    y += 4;
+  };
+  /* lignes à remplir à la main */
+  const fillIn = (title, tint, labels, foot) => {
+    band(title, null, tint, 13.5 + labels.length * 8.5 + (foot ? 8 : 0), 0);
+    labels.forEach(l => {
+      font(10, true); txt(l, M + 3, y);
+      doc.setDrawColor('#b9b1a3'); doc.setLineWidth(0.25); doc.setLineDashPattern([0.6, 1.2], 0); doc.line(M + 64, y + 0.6, R, y + 0.6); doc.setLineDashPattern([], 0);
+      y += 8.5;
+    });
+    if (foot) { font(9, true, C.accT); txt(foot, M + 3, y + 1); y += 8; }
+    y += 4;
+  };
+  const tip = lines => {
+    font(9); const L = lines.flatMap(l => doc.splitTextToSize(pdfTxt(l), R - M - 12)), h = 5 + L.length * 4.4;
+    need(h + 4);
+    doc.setFillColor(C.chip); doc.roundedRect(M, y, R - M, h, 3, 3, 'F'); doc.setFillColor(C.acc); doc.rect(M, y + 2, 1.4, h - 4, 'F');
+    doc.text(L, M + 6, y + 5.6); y += h + 6;
+  };
+  const checked = 'Vérifié le : ____ / ____ / ________   ·   à revoir tous les 6 mois (dates, piles, eau)';
+
+  if (home) {
+    header('Réserve à la maison', `${fam} · tenir ${durTxt(d)}`, durShort(d));
+    stats([['Eau à stocker', `${2 * nd} à ${3 * nd} L`], ['Bidons de 5 L', `${Math.ceil(2 * nd / 5)} à ${Math.ceil(3 * nd / 5)}`], ['Repas sans cuisson', `${3 * nd}`]]);
+    homeRows(a, e, d, !evac).forEach((r, i) => section(r.title, null, TINTS[i], 1, r.items.map(it => [it[1], it[2], it[5]])));
+    section('Selon vos besoins', null, TINTS[3], 1, PDF_HOME_EXTRA);
+    fillIn('Repères de la maison', TINTS[4], ["Arrivée d'eau (robinet)", 'Vanne de gaz', 'Disjoncteur électrique', 'Radio locale (fréquence)']);
+    tip(["Rangement : un bac près de l'entrée. L'eau à côté, au frais et à l'abri de la lumière.",
+      ...(both ? ["Papiers, argent et doubles des clés : dans les sacs d'évacuation."] : []), checked]);
+  }
+  if (evac) {
+    if (home) doc.addPage();
+    header("Sacs d'évacuation", `${fam} · un sac par personne`, `${n} ${pl(n, 'sac', 'sacs')}`);
+    stats([['Sacs à préparer', `${n}`], ['Eau à porter', fr(1.5 * a + 0.5 * e) + ' L'], ['Rangement', 'près de la porte']]);
+    evacRows(a, e).forEach((r, i) => section(r.title, r.per > 1 ? `${r.note} · une case par sac` : r.note, TINTS[i], r.per, r.items.map(it => [it[1], it[2], it[5]])));
+    section('Selon vos besoins', null, TINTS[3], 1, PDF_EXTRA);
+    fillIn('Contacts utiles', TINTS[4], ['Point de rendez-vous', 'Proche hors de la zone', 'Médecin', 'Mairie', 'Voisin'],
+      'Urgences : 112  ·  SAMU 15  ·  Police 17  ·  Pompiers 18  ·  Sourds et malentendants 114 (SMS)');
+    tip(['Sur ordre des autorités : suivez les consignes (radio, FR-Alert) et partez avec vos sacs.', ...(e ? ["Sac d'un enfant : pas plus de 10 à 15 % de son poids."] : []), checked]);
+  }
+  font(7.5, false, C.muted); need(10);
+  doc.text(doc.splitTextToSize(pdfTxt("Sources : info.gouv.fr, Croix-Rouge, et les guides officiels d'une trentaine de pays (Allemagne, Suisse, Japon, Taïwan, Suède...). Ces listes ne remplacent pas les consignes des autorités."), R - M), M, y);
+
+  const pages = doc.getNumberOfPages(), date = new Date().toLocaleDateString('fr-FR');
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p); doc.setDrawColor(C.line); doc.setLineWidth(0.3); doc.line(M, H - 13, R, H - 13);
+    font(7.5, false, C.muted); txt(`Kit d'urgence ${durShort(d)} · ${fam} · ${date}`, M, H - 8); txt(`${p} / ${pages}`, R, H - 8, { align: 'right' });
+  }
+  doc.save(`kit-urgence-${!home ? 'evacuation' : d === 3 ? '72h' : d + '-jours'}.pdf`);
+}
+function downloadLists() {
+  const b = $('bPdf'), lbl = $('bPdfLabel'), label = lbl.textContent;
+  b.disabled = true; lbl.textContent = 'Préparation du PDF…';
+  const fail = msg => { lbl.textContent = msg; setTimeout(() => { lbl.textContent = label; }, 3000); };
+  loadJsPDF().then(J => { makePdf(J); lbl.textContent = label; }, () => fail('Connexion requise, réessayez'))
+    .catch(err => { console.error(err); fail('Erreur, réessayez'); })
+    .then(() => { b.disabled = false; });
+}
+$('bPdf').addEventListener('click', downloadLists);
+
+/* ---------- lecture ---------- */
+let t = 0, playing = false, last = performance.now(), speed = cfg.speed;
+const SPEEDS = [1, 1.5, 2];
+const ICON = {
+  pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+  replay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>',
+  on: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  off: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6"/></svg>',
+  people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17.5" cy="9.5" r="2.4"/><path d="M16 14.6a4.6 4.6 0 0 1 5.5 4.6"/></svg>'
+};
+function syncButtons() {
+  $('bPlay').innerHTML = playing ? ICON.pause : ICON.play;
+  $('bPlay').setAttribute('aria-label', playing ? 'Mettre en pause' : 'Lire');
+  $('bVoice').innerHTML = voiceOn ? ICON.on : ICON.off;
+  $('bVoice').setAttribute('aria-label', voiceOn ? 'Couper la voix off' : 'Activer la voix off');
+  $('bVoice').hidden = !hasVoice;
+  $('bReplay').innerHTML = ICON.replay;
+  $('bConfig').innerHTML = ICON.people;
+  $('bSpeed').textContent = 'x' + fr(speed);
+  $('bSpeed').setAttribute('aria-label', `Vitesse x${fr(speed)}, changer la vitesse`);
+}
+function setSpeed(v) { speed = cfg.speed = v; saveCfg(); if (active) active.a.playbackRate = v; syncButtons(); }
+function skipToEnd() {
+  stopAudio(); t = DUR; playing = false; syncButtons(); stage.classList.remove('idle');
+  setTimeout(() => $('bPdf').focus({ preventScroll: true }), 60);
+}
+function restart() { stopAudio(); t = 0; curSeg = null; subKey = ''; playing = true; syncButtons(); }
+function launch() {
+  cfg.voice = $('voice').checked; saveCfg();
+  voiceOn = cfg.voice && hasVoice;
+  if (voiceOn) LINES.forEach(l => audioFor(l.id));
+  configuring = false; stage.classList.remove('configuring'); $('start').hidden = true;
+  restart(); poke(); $('bPlay').focus({ preventScroll: true });
+}
+function openConfig() {
+  stopAudio();
+  playing = false; configuring = true; stage.classList.add('configuring'); $('start').hidden = false;
+  t = K.previewT; curSeg = null; syncForm(); syncButtons();
+  form.querySelector('.st-btn:not(:disabled)').focus({ preventScroll: true });
+}
+function togglePlay() {
+  if (t >= DUR) { restart(); return; }
+  playing = !playing;
+  if (active) { if (playing) { const pr = active.a.play(); if (pr && pr.catch) pr.catch(() => {}); } else active.a.pause(); }
+  syncButtons();
+}
+$('bPlay').addEventListener('click', togglePlay);
+$('bSpeed').addEventListener('click', () => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]));
+$('bSkip').addEventListener('click', skipToEnd);
+$('bReplay').addEventListener('click', restart);
+$('bAgain').addEventListener('click', restart);
+$('bConfig').addEventListener('click', openConfig);
+$('bEdit').addEventListener('click', openConfig);
+$('bVoice').addEventListener('click', () => { voiceOn = !voiceOn && hasVoice; if (!voiceOn) stopAudio(); cfg.voice = voiceOn; saveCfg(); syncButtons(); });
+document.addEventListener('keydown', ev => {
+  if (configuring) return;
+  if (ev.code === 'Space' && !(ev.target instanceof HTMLButtonElement)) { ev.preventDefault(); togglePlay(); }
+  if (ev.key === 'r' || ev.key === 'R') restart();
+  if (ev.key === 'End') skipToEnd();
+});
+let idleTimer = 0;
+function poke() { stage.classList.remove('idle'); clearTimeout(idleTimer); idleTimer = setTimeout(() => { if (playing) stage.classList.add('idle'); }, 2500); }
+['pointermove', 'pointerdown', 'keydown', 'focusin'].forEach(ev => stage.addEventListener(ev, poke));
+
+window.kit72 = { seek: s => { stopAudio(); t = s; }, get time() { return t; }, get speed() { return speed; }, get rate() { return active ? active.a.playbackRate : null; }, get voice() { return hasVoice; }, get audioPlaying() { return !!(active && !active.a.paused); }, get lines() { return LINES.map(l => [l.id, +l.t.toFixed(2), +l.sd.toFixed(2), l.chunks.map(c => [c.text, +c.s0.toFixed(2)])]); }, get duration() { return DUR; }, get segments() { return SEGS.map(s => [s.type, +s.start.toFixed(2), +s.end.toFixed(2)]); }, launchMuted: () => { $('voice').checked = false; launch(); playing = false; syncButtons(); } };
+
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (playing) {
+    const ac = audioClock(); t = ac != null ? ac : t + dt * speed;
+    if (t >= DUR) { t = DUR; playing = false; stopAudio(); syncButtons(); stage.classList.remove('idle'); }
+    voiceTick(t);
+  }
+  update(t);
+  renderer.render(scene, camera);
+  updateHTML(t);
+  requestAnimationFrame(loop);
+}
+applyCfg(); syncButtons();
+requestAnimationFrame(loop);
+loadVoices().then(ok => { if (ok && configuring) { applyCfg(); syncButtons(); } });
+})();
+</script>
+</body>
+</html>
